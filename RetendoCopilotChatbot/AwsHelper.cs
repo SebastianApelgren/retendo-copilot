@@ -85,7 +85,7 @@ namespace RetendoCopilotChatbot
 
         public async Task<InvokeModelResult> GenerateResponseAsync(List<ChatMessage> chatMessages, int numberOfResults = 5)
         {
-            InvokeModelRequest invokeModelRequest = CreateModelRequest(chatMessages);
+            InvokeModelRequest invokeModelRequest = CreateInvokeModelRequest(chatMessages);
             InvokeModelResponse response = await runtimeClient.InvokeModelAsync(invokeModelRequest);
 
             using(StreamReader reader = new StreamReader(response.Body))
@@ -96,7 +96,40 @@ namespace RetendoCopilotChatbot
             }
         }
 
-        private InvokeModelRequest CreateModelRequest(List<ChatMessage> chatMessages, int maxTokens = 4096, double temp = 0.5)
+        public async Task<ChatMessage> GenerateConversationResponseAsync(List<ChatMessage> chatMessages, string prompt, int numberOfResults = 5)
+        {
+            ConverseRequest converseRequest = CreateConverseRequest(chatMessages, prompt);
+            ConverseResponse response = await runtimeClient.ConverseAsync(converseRequest);
+
+            ChatMessage assistantResponse = ChatMessage.CreateFromAssistant(response.Output.Message.Content[0].Text);
+
+            return assistantResponse;
+        } 
+
+        private ConverseRequest CreateConverseRequest(List<ChatMessage> chatMessages, string prompt, int numberOfResults = 5) {
+            SystemContentBlock systemPrompt = new SystemContentBlock
+            {
+                Text = prompt,
+            };
+
+            Amazon.BedrockRuntime.Model.InferenceConfiguration inferenceConfig = new Amazon.BedrockRuntime.Model.InferenceConfiguration
+            {
+                MaxTokens = 4096,
+                Temperature = .5f,
+            };
+
+            ConverseRequest converseRequest = new ConverseRequest
+            {
+                ModelId = modelId,
+                System = new List<SystemContentBlock> { systemPrompt },
+                Messages = chatMessages.ToAwsMessages(),
+                InferenceConfig = inferenceConfig,
+            };
+
+            return converseRequest;
+        }
+
+        private InvokeModelRequest CreateInvokeModelRequest(List<ChatMessage> chatMessages, int maxTokens = 4096, double temp = 0.5)
         {
             string nativeRequest = JsonSerializer.Serialize(new
             {

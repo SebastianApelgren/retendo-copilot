@@ -19,49 +19,36 @@ namespace RetendoCopilotChatbot
         public async Task<string> GetChatResponseAsync(string query, List<ChatMessage> chatMessages)
         {
             string prompt = await CreatePromptAsync(query);
-            chatMessages.Add(ChatMessage.CreateFromUser(prompt));
-            InvokeModelResult result = await awsHelper.GenerateResponseAsync(chatMessages);
-            string response = result.MessageText;
-            chatMessages.RemoveAt(chatMessages.Count - 1);
-            chatMessages.Add(ChatMessage.CreateFromUser(query));   
-            chatMessages.Add(ChatMessage.CreateFromAssistant(response));
-            return response;
+
+            List<string> contexts = await awsHelper.RetrieveAsync(query, 5);
+
+            chatMessages.Add(ChatMessage.CreateFromUser(query, contexts.CreateContextChunk()));
+            //InvokeModelResult result = await awsHelper.GenerateResponseAsync(chatMessages);
+            
+            ChatMessage response = await awsHelper.GenerateConversationResponseAsync(chatMessages, prompt);
+
+            chatMessages.Add(response);
+
+            //string response = result.MessageText;
+ 
+            //chatMessages.Add(ChatMessage.CreateFromAssistant(response));
+            return response.Content;
         }
 
         private async Task<string> CreatePromptAsync(string query)
         {
-            List<string> contexts = new List<string>();
-            contexts = await awsHelper.RetrieveAsync(query, 5);
+            List<string> contexts = await awsHelper.RetrieveAsync(query, 5);
 
-            string prompt = @$"Mål: Du är en kundtjänstchattbot som är utformad för att korrekt besvara frågor baserat på den tillhandahållna dokumentationen och tidigare meddelanden i konversationen. Ditt mål är att ge hjälpsamma och korrekta svar på kundförfrågningar.
+            string prompt = @$"Du är nu en kundtjänstchattbot. Din uppgift är att hjälpa användare genom att svara på deras frågor baserat på både den tillhandahållna dokumentationen och tidigare meddelanden i konversationen. Svara alltid så exakt som möjligt och sammanfatta informationen från dokumentationen och konversationen med dina egna ord. Om en fråga inte kan besvaras med den tillgängliga dokumentationen eller informationen från konversationen, meddela användaren att du inte har den informationen just nu.
 
-Instruktioner:
-- Studera noggrant den tillhandahållna dokumentationen för att förstå vilken information som finns tillgänglig.
-- När en kund ställer en fråga, sök i dokumentationen och tidigare meddelanden i konversationen efter relevant information för att formulera ett svar.
-- Om du hittar ett klart och fullständigt svar i dokumentationen eller tidigare meddelanden, ge det svaret ordagrant utan att modifiera eller lägga till något.
-- Skriv aldrig ut några namn, personnummer eller annan identifierande information om sådan finns i dokumentationen eller tidigare meddelanden.
-- Om varken dokumentationen eller tidigare meddelanden innehåller ett fullständigt svar, meddela vänligt kunden att du inte har tillräcklig information för att fullt ut besvara deras fråga.
-- Hitta aldrig på information eller spekulera bortom vad som anges i dokumentationen och tidigare meddelanden.
-- Bibehåll en professionell och vänlig ton i dina svar.
-- Om en kunds fråga är oklar eller för bred, be vänligen om förtydligande innan du försöker svara.
-- Gör inga citationer från dokumentationen eller tidigare meddelanden utan svara direkt på kundens fråga.
-- Skriv inte 'Enligt dokumentationen' eller något liknande i dina svar.
+När du svarar på frågor, följ dessa riktlinjer:
 
-Här kommer dokumentationen listat från mest tillförlitlig till minst tillförlitlig:
+Exakthet: Svara endast baserat på den tillhandahållna dokumentationen och tidigare meddelanden i konversationen. Gissa inte eller spekulera.
+Tydlighet: Formulera dina svar tydligt och koncist med dina egna ord.
+Sammanfattning: Sammanfatta informationen från dokumentationen och konversationen istället för att hänvisa direkt till dem.
+Begränsning: Om dokumentationen och konversationen inte täcker frågan, informera användaren att du för närvarande inte har den informationen.
 
-<dokumentationen>
-{contexts.CreateContextChunk()}
-</dokumentationen>
-
-Här kommer kundfrågan:
-
-<kundfråga>
-{query}
-</kundfråga>
-
-Din kunskap kommer enbart från den tillhandahållna dokumentationen och tidigare meddelanden i konversationen. Du har ingen ytterligare information utöver vad som finns i de dokumenten och tidigare meddelanden. Svara sanningsenligt baserat på dokumentationen och försök aldrig att hitta på eller gissa svar.
-
-Assistant:";
+Kom ihåg att alltid hålla dig till den information som finns i dokumentationen och konversationen. Om du behöver mer information, fråga mig om den specifika dokumentationen.";
             return prompt;
         }
     }
