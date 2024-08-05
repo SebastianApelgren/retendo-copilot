@@ -26,12 +26,13 @@ namespace RetendoCopilotChatbot
         public static List<Message> ToAwsMessages(this List<ChatMessage> chatMessages)
         {
             List<Message> messages = new List<Message>();
+
             foreach (ChatMessage chatMessage in chatMessages)
             {
                 if (chatMessage.Role == "user")
                 {
                     byte[] byteArray = Encoding.UTF8.GetBytes(chatMessage.Documents);
-                    //byte[] byteArray = Encoding.ASCII.GetBytes(contents);
+
                     MemoryStream stream = new MemoryStream(byteArray);
 
                     DocumentSource documentSource = new DocumentSource
@@ -45,23 +46,24 @@ namespace RetendoCopilotChatbot
                         {
                             new ContentBlock
                             {
-                                
                                 Text = chatMessage.Content,
                             },
                             new ContentBlock
                             {
                                 Document = new DocumentBlock
                                 {
-                                    Name = $"Dokumentation till ",
+                                    Name = $"Relevant dokumentation (id {Guid.NewGuid()})",
                                     Format = "txt",
                                     Source = documentSource,
                                 },
-                                
+
                             }
                         },
                         Role = chatMessage.Role,
                     });
-                } else {
+                }
+                else
+                {
                     messages.Add(new Message
                     {
                         Content = new List<ContentBlock>

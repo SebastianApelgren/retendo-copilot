@@ -88,7 +88,7 @@ namespace RetendoCopilotChatbot
             InvokeModelRequest invokeModelRequest = CreateInvokeModelRequest(chatMessages);
             InvokeModelResponse response = await runtimeClient.InvokeModelAsync(invokeModelRequest);
 
-            using(StreamReader reader = new StreamReader(response.Body))
+            using (StreamReader reader = new StreamReader(response.Body))
             {
                 string responseBody = reader.ReadToEnd();
                 InvokeModelResult result = InvokeModelResult.FromJson(responseBody);
@@ -104,9 +104,10 @@ namespace RetendoCopilotChatbot
             ChatMessage assistantResponse = ChatMessage.CreateFromAssistant(response.Output.Message.Content[0].Text);
 
             return assistantResponse;
-        } 
+        }
 
-        private ConverseRequest CreateConverseRequest(List<ChatMessage> chatMessages, string prompt, int numberOfResults = 5) {
+        private ConverseRequest CreateConverseRequest(List<ChatMessage> chatMessages, string prompt, int numberOfResults = 5)
+        {
             SystemContentBlock systemPrompt = new SystemContentBlock
             {
                 Text = prompt,
