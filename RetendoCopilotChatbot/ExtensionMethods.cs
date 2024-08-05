@@ -17,7 +17,7 @@ namespace RetendoCopilotChatbot
 
         public static string CreateContextChunk(this List<string> contexts)
         {
-            return string.Join("\n\r-----------\n\r", contexts);
+            return string.Join("\r\n-----------\r\n", contexts);
         }
     }
 }

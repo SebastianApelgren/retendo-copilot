@@ -13,23 +13,24 @@ namespace RetendoCopilotChatbot
             string awsAccessKeyId = SecretManager.GetAwsAccessKey();
             string awsSecretAccessKey = SecretManager.GetAwsSecretAccessKey();
 
+            string startMessage = "Assistant: Hur kan jag hjälpa dig?";
+
+            AwsHelper awsHelper = new AwsHelper(modelId, region, kbId, awsAccessKeyId, awsSecretAccessKey);
+            Copilot copilot = new Copilot(awsHelper);
+            List<ChatMessage> chatMessages = new List<ChatMessage>();
+
+            Console.WriteLine(startMessage);
+
             while (true)
             {
-                Console.Clear();
-
-                Console.WriteLine("Hur kan jag hjälpa dig?");
-
                 string query = Console.ReadLine()!;
 
                 if (query == "exit")
                     break;
 
-                AwsHelper awsHelper = new AwsHelper(modelId, region, kbId, awsAccessKeyId, awsSecretAccessKey);
-                InvokeModelResult response = await awsHelper.GenerateResponseAsync(query);
+                string response = await copilot.GetChatResponseAsync(query, chatMessages);
 
-                Console.WriteLine(response.MessageText);
-
-                Console.ReadLine();
+                Console.WriteLine(response);
             }
         }
     }
