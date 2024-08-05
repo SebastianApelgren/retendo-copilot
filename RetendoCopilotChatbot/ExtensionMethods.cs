@@ -30,35 +30,40 @@ namespace RetendoCopilotChatbot
             {
                 if (chatMessage.Role == "user")
                 {
-                    byte[] byteArray = Encoding.UTF8.GetBytes(chatMessage.Documents);
-                    //byte[] byteArray = Encoding.ASCII.GetBytes(contents);
-                    MemoryStream stream = new MemoryStream(byteArray);
-
-                    DocumentSource documentSource = new DocumentSource
+                    List<ContentBlock> content = new List<ContentBlock>()
                     {
-                        Bytes = stream,
+                        new ContentBlock
+                        {
+                            Text = chatMessage.Content,
+                        }
                     };
+
+                    if (chatMessage.Documents != null)
+                    {
+                        byte[] byteArray = Encoding.UTF8.GetBytes(chatMessage.Documents);
+
+                        MemoryStream stream = new MemoryStream(byteArray);
+
+                        DocumentSource documentSource = new DocumentSource
+                        {
+                            Bytes = stream,
+                        };
+
+                        content.Add(new ContentBlock
+                        {
+                            Document = new DocumentBlock
+                            {
+                                Name = $"Relevant dokumentation (id {Guid.NewGuid()})",
+                                Format = "txt",
+                                Source = documentSource,
+                            },
+
+                        });
+                    }
 
                     messages.Add(new Message
                     {
-                        Content = new List<ContentBlock>
-                        {
-                            new ContentBlock
-                            {
-                                
-                                Text = chatMessage.Content,
-                            },
-                            new ContentBlock
-                            {
-                                Document = new DocumentBlock
-                                {
-                                    Name = $"Dokumentation till ",
-                                    Format = "txt",
-                                    Source = documentSource,
-                                },
-                                
-                            }
-                        },
+                        Content = content,
                         Role = chatMessage.Role,
                     });
                 } else {
