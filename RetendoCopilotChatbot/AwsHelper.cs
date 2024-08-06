@@ -83,9 +83,9 @@ namespace RetendoCopilotChatbot
             }
         }
 
-        public async Task<InvokeModelResult> GenerateResponseAsync(List<ChatMessage> chatMessages, int numberOfResults = 5)
+        public async Task<InvokeModelResult> GenerateResponseAsync(string query, int numberOfResults = 5)
         {
-            InvokeModelRequest invokeModelRequest = CreateInvokeModelRequest(chatMessages);
+            InvokeModelRequest invokeModelRequest = CreateInvokeModelRequest(query);
             InvokeModelResponse response = await runtimeClient.InvokeModelAsync(invokeModelRequest);
 
             using(StreamReader reader = new StreamReader(response.Body))
@@ -129,14 +129,14 @@ namespace RetendoCopilotChatbot
             return converseRequest;
         }
 
-        private InvokeModelRequest CreateInvokeModelRequest(List<ChatMessage> chatMessages, int maxTokens = 4096, double temp = 0.5)
+        private InvokeModelRequest CreateInvokeModelRequest(string query, int maxTokens = 4096, double temp = 0.5)
         {
             string nativeRequest = JsonSerializer.Serialize(new
             {
                 anthropic_version = "bedrock-2023-05-31",
                 max_tokens = maxTokens,
                 temperature = temp,
-                messages = chatMessages.ToArray(),
+                messages = new[] { new { role = "user", content = query } },
             });
 
             InvokeModelRequest invokeModelRequest = new InvokeModelRequest
