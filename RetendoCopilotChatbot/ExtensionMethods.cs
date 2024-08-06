@@ -66,7 +66,9 @@ namespace RetendoCopilotChatbot
                         Content = content,
                         Role = chatMessage.Role,
                     });
-                } else {
+                }
+                else
+                {
                     messages.Add(new Message
                     {
                         Content = new List<ContentBlock>
