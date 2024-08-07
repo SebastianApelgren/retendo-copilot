@@ -1,0 +1,6 @@
+@RetendoCopilotApi_HostAddress = http://localhost:5252
+
+GET {{RetendoCopilotApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -7,7 +7,7 @@ namespace RetendoCopilotChatbot
     {
         private const string modelId = "anthropic.claude-3-sonnet-20240229-v1:0";
         private const string region = "eu-west-2";
-        private const string kbId = "CJHYRDAGBS";
+        private const string kbId = "KnowledgeBaseId";
 
         public async static Task Main(string[] args)
         {

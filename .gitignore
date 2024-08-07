@@ -1,3 +1,6 @@
 .vs/
 /RetendoCopilotChatbot/bin/*
 /RetendoCopilotChatbot/obj/*
+/RetendoCopilotApi/bin/*
+/RetendoCopilotApi/obj/*
+/RetendoCopilotApi/Properties/launchSettings.json
