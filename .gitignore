@@ -4,3 +4,5 @@
 /RetendoCopilotApi/bin/*
 /RetendoCopilotApi/obj/*
 /RetendoCopilotApi/Properties/launchSettings.json
+/RetendoDataHandler/bin/*
+/RetendoDataHandler/obj/*

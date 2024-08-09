@@ -11,7 +11,7 @@ namespace RetendoCopilotApi.Helpers
         {
             string jsonString = JsonSerializer.Serialize(chatMessages);
             string context = Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonString));
-            
+
             return context;
         }
 
