@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RetendoCopilotChatbot
 {
-    internal class SecretManager
+    public class SecretManager
     {
         public static string GetAwsAccessKey()
         {
