@@ -18,7 +18,9 @@ namespace RetendoDataHandler
             string path = "Data";
             string s3Folder = "support-tickets";
 
-            bool success = await UploadTickets(path, s3Folder);
+            List<SupportTicket> tickets = PersonalDataHelper.GetSupportTickets(path);
+
+            bool success = await UploadTickets(tickets, s3Folder);
 
             if (!success)
             {
@@ -30,10 +32,8 @@ namespace RetendoDataHandler
             }
         }
 
-        private async static Task<bool> UploadTickets(string path, string s3Folder)
+        private async static Task<bool> UploadTickets(List<SupportTicket> tickets, string s3Folder)
         {
-            List<SupportTicket> tickets = PersonalDataHelper.GetSupportTickets(path);
-
             string awsAccessKey = SecretManager.GetAwsAccessKey();
             string awsSecretAccessKey = SecretManager.GetAwsSecretAccessKey();
 

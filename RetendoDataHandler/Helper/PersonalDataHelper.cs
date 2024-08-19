@@ -14,7 +14,7 @@ namespace RetendoDataHandler.Helper
         {
             List<SupportTicket> tickets = new List<SupportTicket>();
 
-            List<string> names = new List<string>() { "jens", "apelgren" };
+            HashSet<string> names = new HashSet<string>() { "jens", "apelgren" };
 
             foreach (string fileName in Directory.GetFiles(path))
             {
@@ -33,7 +33,7 @@ namespace RetendoDataHandler.Helper
                         foreach (string name in requesterName)
                         {
                             string nameLower = name.ToLower();
-                            nameLower = Regex.Replace(nameLower, @"[\p{P}-[.]]", "");
+                            nameLower = Regex.Replace(nameLower, @"[\p{P}-[.]]", ""); //removes punctuation
 
                             if (!names.Contains(nameLower))
                             {
@@ -50,7 +50,8 @@ namespace RetendoDataHandler.Helper
                     }
                 }
             }
-            RemoveNames(tickets, names);
+
+            RemoveNames(tickets, names.ToList());
 
             return tickets;
         }

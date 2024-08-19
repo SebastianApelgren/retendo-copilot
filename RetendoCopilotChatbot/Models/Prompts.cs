@@ -20,7 +20,7 @@ Begränsning: Om dokumentationen, konversationen och kundärendena inte täcker 
 Säkerhet: Skydda användarens integritet och information genom att inte be om eller dela känslig information.
 Kom ihåg att alltid hålla dig till den information som finns i dokumentationen, konversationen och kundärendena. Om du behöver mer information, fråga mig om den specifika dokumentationen.";
 
-        public const string DocumentNeededPrompt = @"Du hjälper till att avgöra om en chatbot behöver söka i dokumentationen för att svara på en användarfråga och om användarfrågan är lämplig att svara på.
+        public const string DocumentNeededAndRelevantQuestionPrompt = @"Du hjälper till att avgöra om en chatbot behöver söka i dokumentationen för att svara på en användarfråga och om användarfrågan är lämplig att svara på.
 Oftast ska dokumentationen användas men om användaren bara refererar till ett tidigare meddelande eller säger något som inte är en fråga behöver inte dokumentationen användas.
 Om du tror att svaret på användarens fråga finns i dokumentationen, svara 'ja'. Annars, svara 'nej'. 
 Skulle användaren fråga om känslig information såsom till exemple namn, telefonnummer, personuppgiften eller något annat som inte är lämpligt att svara på, svara 'olämpligt'.
@@ -49,17 +49,14 @@ Du ska svara med exakt samma meddelande som finns nedan med den ända ändringen
 Om du hittar personuppgifter ska du ersätta det med BORTAGEN. Du ska alltså svara med exakt samma text annars.
 <meddelande>
 {0}
-</meddelande>
-";
+</meddelande>";
 
-        public const string RewriteResponsePrompt3 = @"Du ska kolla i följande meddelande om det finns känslig personinformation som namn, personnummer eller annat.
+        public const string RewriteResponsePrompt3 = @"Du ska kolla i följande meddelande från Retendo's kundtjänst om det finns känslig personinformation som namn, personnummer eller annat och om det skulle finnas känslig verksamhetsinformation.
 Skulle det finnas personlig information såsom namn, personnummer, telefonnummer, e-postadresser eller andra personliga identifierare, ska du svara med 'ja'. Annars, svara med 'nej'.
 Svara bara med ett av de två orden.
 <meddelande>
 {0}
-</meddelande>
-";
-
+</meddelande>";
     }
 }
 

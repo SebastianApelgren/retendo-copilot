@@ -21,7 +21,7 @@ namespace RetendoDataHandler.Helper
         {
             this.region = region;
 
-            var clientConfig = new AmazonS3Config
+            AmazonS3Config clientConfig = new AmazonS3Config
             {
                 RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(region), // Replace with your bucket's region
                 LogResponse = true,
@@ -43,7 +43,7 @@ namespace RetendoDataHandler.Helper
                 string content = JsonSerializer.Serialize(ticket);
                 string fileName = $"{ticket.Subject}_{Guid.NewGuid()}.txt";
 
-                var putRequest = new PutObjectRequest
+                PutObjectRequest putRequest = new PutObjectRequest
                 {
                     BucketName = bucketName,
                     Key = $"{path}{fileName}",
@@ -82,7 +82,7 @@ namespace RetendoDataHandler.Helper
 
             path += name;
 
-            var putRequest = new PutObjectRequest
+            PutObjectRequest putRequest = new PutObjectRequest
             {
                 BucketName = bucketName,
                 Key = $"{path}/",

@@ -11,6 +11,7 @@ using Amazon.BedrockAgentRuntime;
 using Amazon.BedrockAgentRuntime.Model;
 using System.Text.Json;
 using RetendoCopilotChatbot.Models;
+using System.Security.Cryptography;
 
 namespace RetendoCopilotChatbot
 {
@@ -19,14 +20,12 @@ namespace RetendoCopilotChatbot
         private string knowledgeBaseIdManual;
         private string knowledgeBaseIdTicket;
         private string modelId;
-        private string modelArn;
         private AmazonBedrockAgentRuntimeClient client;
         private AmazonBedrockRuntimeClient runtimeClient;
 
         public AwsHelper(string modId, string region, string kbIdManual, string kbIdTicket, string awsAccessKeyId, string awsSecretAccessKey)
         {
             modelId = modId;
-            modelArn = $"arn:aws:bedrock:{region}::foundation-model/{modelId}";
             knowledgeBaseIdManual = kbIdManual;
             knowledgeBaseIdTicket = kbIdTicket;
 
@@ -68,8 +67,13 @@ namespace RetendoCopilotChatbot
                 },
             };
 
-            RetrieveResponse responseManual = await client.RetrieveAsync(retrieveRequestManual);
-            RetrieveResponse responseTicket = await client.RetrieveAsync(retrieveRequestTicket);
+            Task<RetrieveResponse> responseManualTask = client.RetrieveAsync(retrieveRequestManual);
+            Task<RetrieveResponse> responseTicketTask = client.RetrieveAsync(retrieveRequestTicket);
+
+            await Task.WhenAll(responseManualTask, responseTicketTask);
+
+            RetrieveResponse responseManual = responseManualTask.Result;
+            RetrieveResponse responseTicket = responseTicketTask.Result;
 
             List<string> contexts = new List<string>();
 

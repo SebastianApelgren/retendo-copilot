@@ -30,7 +30,6 @@ namespace RetendoCopilotChatbot
             if (shouldUseContexts == "olämpligt")
             {
                 return "Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan dem hjälpa dig.";
-                //chatMessages.Add(ChatMessage.CreateFromUser(query, null, null));
             }
             else if (shouldUseContexts == "ja")
             {
@@ -65,16 +64,16 @@ namespace RetendoCopilotChatbot
         {
             string prompt = Prompts.ChatbotSystemPrompt;
 
-            var watch = Stopwatch.StartNew();
-            var watch2 = Stopwatch.StartNew();
+            Stopwatch watch = Stopwatch.StartNew();
+            Stopwatch watch2 = Stopwatch.StartNew();
 
             watch.Start();
             watch2.Start();
 
-            string shouldUseContexts = await GetShouldSearchInDocumentationOrShouldAnswerAsync(query);
+            string queryVerdict = await GetShouldSearchInDocumentationOrShouldAnswerAsync(query);
 
             watch2.Stop();
-            Console.WriteLine($"Time to get shouldUseContexts: {watch2.ElapsedMilliseconds} ms");
+            Console.WriteLine($"Time to get queryVerdict: {watch2.ElapsedMilliseconds} ms");
 
             watch2.Restart();
             watch2.Start();
@@ -83,14 +82,11 @@ namespace RetendoCopilotChatbot
 
             int numberOfResults = 5;
 
-            shouldUseContexts = "ja";
-
-            if (shouldUseContexts == "olämpligt")
+            if (queryVerdict == "olämpligt")
             {
-                //return "Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan dem hjälpa dig.";
-                chatMessages.Add(ChatMessage.CreateFromUser(query, null, null));
+                return "Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan dem hjälpa dig.";
             }
-            else if (shouldUseContexts == "ja")
+            else if (queryVerdict == "ja")
             {
                 chatMessages.RemoveDocumentsAndTickets(); //removes old documents and tickets as only 5 documents/tickets can be sent at a time.
                 contexts = await awsHelper.RetrieveAsync(query, numberOfResults);
@@ -107,8 +103,6 @@ namespace RetendoCopilotChatbot
 
             ChatMessage response = await awsHelper.GenerateConversationResponseAsync(chatMessages, prompt);
 
-            string oldResponse = response.Content;
-
             watch2.Stop();
             Console.WriteLine($"Time to generate response: {watch2.ElapsedMilliseconds} ms");
 
@@ -120,7 +114,7 @@ namespace RetendoCopilotChatbot
             if (isSensitive)
             {
                 chatMessages.RemoveAt(chatMessages.Count - 1);
-                return "Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan dem hjälpa dig.";
+                response.Content = "Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan dem hjälpa dig.";
             }
 
             watch2.Stop();
@@ -131,16 +125,12 @@ namespace RetendoCopilotChatbot
             watch.Stop();
             Console.WriteLine($"Total time for query: {watch.ElapsedMilliseconds} ms");
 
-            Console.WriteLine();
-            Console.WriteLine($"Before rewriting: {oldResponse}");
-            Console.WriteLine();
-
             return response.Content;
         }
 
         public async Task<string> GetShouldSearchInDocumentationOrShouldAnswerAsync(string query)
         {
-            string prompt = string.Format(Prompts.DocumentNeededPrompt, query);
+            string prompt = string.Format(Prompts.DocumentNeededAndRelevantQuestionPrompt, query);
 
             InvokeModelResult result = await awsHelper.GenerateResponseAsync(prompt);
 
