@@ -4,7 +4,6 @@ using RetendoCopilotApi.Models;
 using RetendoCopilotChatbot;
 using RetendoCopilotChatbot.Models;
 
-
 namespace RetendoCopilotApi.Controllers
 {
     [ApiController]
@@ -27,7 +26,7 @@ namespace RetendoCopilotApi.Controllers
 
             Copilot copilot = new Copilot(awsHelper);
 
-            string response = await copilot.GetChatResponseAsync(body.UserMessage, chatMessages);
+            ChatResponse response = await copilot.GetChatResponseAsync(body.UserMessage, chatMessages);
 
             string serializedContext = ContextHelper.SerializeAndConvertToBase64(chatMessages);
 

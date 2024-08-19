@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
+﻿using System.Text;
 using Amazon;
 using Amazon.BedrockRuntime;
 using Amazon.BedrockRuntime.Model;
@@ -11,7 +6,6 @@ using Amazon.BedrockAgentRuntime;
 using Amazon.BedrockAgentRuntime.Model;
 using System.Text.Json;
 using RetendoCopilotChatbot.Models;
-using System.Security.Cryptography;
 
 namespace RetendoCopilotChatbot
 {

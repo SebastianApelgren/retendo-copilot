@@ -1,5 +1,4 @@
-﻿using Amazon.Runtime.Internal.Settings;
-using RetendoCopilotChatbot.Models;
+﻿using RetendoCopilotChatbot.Models;
 
 namespace RetendoCopilotChatbot
 {
@@ -35,7 +34,7 @@ namespace RetendoCopilotChatbot
                 if (query == "exit")
                     break;
 
-                string response = await copilot.GetChatResponseTimedAsync(query, chatMessages);
+                ChatResponse response = await copilot.GetChatResponseAsync(query, chatMessages);
 
                 Console.WriteLine($"Assistant: {response}");
             }
