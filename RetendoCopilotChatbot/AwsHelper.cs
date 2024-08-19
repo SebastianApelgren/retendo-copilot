@@ -16,74 +16,77 @@ namespace RetendoCopilotChatbot
 {
     public class AwsHelper
     {
-        private string knowledgeBaseId;
+        private string knowledgeBaseIdManual;
+        private string knowledgeBaseIdTicket;
         private string modelId;
         private string modelArn;
-        private KnowledgeBaseConfiguration knowledgeBaseConfiguration;
         private AmazonBedrockAgentRuntimeClient client;
         private AmazonBedrockRuntimeClient runtimeClient;
 
-        public AwsHelper(string modId, string region, string kbId, string awsAccessKeyId, string awsSecretAccessKey)
+        public AwsHelper(string modId, string region, string kbIdManual, string kbIdTicket, string awsAccessKeyId, string awsSecretAccessKey)
         {
             modelId = modId;
             modelArn = $"arn:aws:bedrock:{region}::foundation-model/{modelId}";
-            knowledgeBaseId = kbId;
-            knowledgeBaseConfiguration = new KnowledgeBaseConfiguration
-            {
-                KnowledgeBaseId = kbId,
-            };
+            knowledgeBaseIdManual = kbIdManual;
+            knowledgeBaseIdTicket = kbIdTicket;
 
             client = new AmazonBedrockAgentRuntimeClient(awsAccessKeyId, awsSecretAccessKey, RegionEndpoint.GetBySystemName(region));
             runtimeClient = new AmazonBedrockRuntimeClient(awsAccessKeyId, awsSecretAccessKey, RegionEndpoint.GetBySystemName(region));
         }
 
-        public async Task<List<string>> RetrieveAsync(string query, int numberOfResults)
+        public async Task<List<string>> RetrieveAsync(string query, int numberOfResults = 5)
         {
-            try
+            RetrieveRequest retrieveRequestManual = new RetrieveRequest
             {
-                RetrieveRequest retrieveRequest = new RetrieveRequest
+                RetrievalConfiguration = new KnowledgeBaseRetrievalConfiguration
                 {
-                    RetrievalConfiguration = new KnowledgeBaseRetrievalConfiguration
+                    VectorSearchConfiguration = new KnowledgeBaseVectorSearchConfiguration
                     {
-                        VectorSearchConfiguration = new KnowledgeBaseVectorSearchConfiguration
-                        {
-                            NumberOfResults = numberOfResults,
-                        },
+                        NumberOfResults = numberOfResults,
                     },
-                    KnowledgeBaseId = knowledgeBaseId,
-                    RetrievalQuery = new KnowledgeBaseQuery
-                    {
-                        Text = query,
-                    },
-                };
-
-                RetrieveResponse response = await client.RetrieveAsync(retrieveRequest);
-
-                if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
-                    throw new Exception($"Error: {response.HttpStatusCode}");
-
-                List<string> contexts = new List<string>();
-
-                for (int i = 0; i < response.RetrievalResults.Count; i++)
+                },
+                KnowledgeBaseId = knowledgeBaseIdManual,
+                RetrievalQuery = new KnowledgeBaseQuery
                 {
-                    contexts.Add(response.RetrievalResults[i].GetText());
-                }
+                    Text = query,
+                },
+            };
 
-                return contexts;
-            }
-            catch (AmazonBedrockAgentRuntimeException ex)
+            RetrieveRequest retrieveRequestTicket = new RetrieveRequest
             {
-                // Handle specific exceptions related to AWS SDK
-                throw;
-            }
-            catch (Exception ex)
+                RetrievalConfiguration = new KnowledgeBaseRetrievalConfiguration
+                {
+                    VectorSearchConfiguration = new KnowledgeBaseVectorSearchConfiguration
+                    {
+                        NumberOfResults = numberOfResults,
+                    },
+                },
+                KnowledgeBaseId = knowledgeBaseIdTicket,
+                RetrievalQuery = new KnowledgeBaseQuery
+                {
+                    Text = query,
+                },
+            };
+
+            RetrieveResponse responseManual = await client.RetrieveAsync(retrieveRequestManual);
+            RetrieveResponse responseTicket = await client.RetrieveAsync(retrieveRequestTicket);
+
+            List<string> contexts = new List<string>();
+
+            for (int i = 0; i < responseManual.RetrievalResults.Count; i++)
             {
-                // Handle other potential exceptions
-                throw;
+                contexts.Add(responseManual.RetrievalResults[i].GetText());
             }
+
+            for (int i = 0; i < responseTicket.RetrievalResults.Count; i++)
+            {
+                contexts.Add(responseTicket.RetrievalResults[i].GetText());
+            }
+
+            return contexts;
         }
 
-        public async Task<InvokeModelResult> GenerateResponseAsync(string query, int numberOfResults = 5)
+        public async Task<InvokeModelResult> GenerateResponseAsync(string query)
         {
             InvokeModelRequest invokeModelRequest = CreateInvokeModelRequest(query);
             InvokeModelResponse response = await runtimeClient.InvokeModelAsync(invokeModelRequest);
@@ -96,7 +99,7 @@ namespace RetendoCopilotChatbot
             }
         }
 
-        public async Task<ChatMessage> GenerateConversationResponseAsync(List<ChatMessage> chatMessages, string prompt, int numberOfResults = 5)
+        public async Task<ChatMessage> GenerateConversationResponseAsync(List<ChatMessage> chatMessages, string prompt)
         {
             ConverseRequest converseRequest = CreateConverseRequest(chatMessages, prompt);
             ConverseResponse response = await runtimeClient.ConverseAsync(converseRequest);
@@ -106,7 +109,7 @@ namespace RetendoCopilotChatbot
             return assistantResponse;
         }
 
-        private ConverseRequest CreateConverseRequest(List<ChatMessage> chatMessages, string prompt, int numberOfResults = 5)
+        private ConverseRequest CreateConverseRequest(List<ChatMessage> chatMessages, string prompt)
         {
             SystemContentBlock systemPrompt = new SystemContentBlock
             {

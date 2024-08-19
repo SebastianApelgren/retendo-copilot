@@ -6,7 +6,8 @@
         private const string AwsSecretAccessKey = "AWS_SECRET_ACCESS_KEY";
         private const string ModelId = "MODEL_ID";
         private const string Region = "REGION";
-        private const string KnowledgeBaseId = "KNOWLEDGE_BASE_ID";
+        private const string KnowledgeBaseIdManual = "KNOWLEDGE_BASE_ID_MANUAL";
+        private const string KnowledgeBaseIdTickets = "KNOWLEDGE_BASE_ID_TICKETS";
 
         public static string GetAwsAccessKey()
         {
@@ -18,9 +19,14 @@
             return GetVariable(AwsSecretAccessKey);
         }
 
-        public static string GetKnowledgeBaseId()
+        public static string GetKnowledgeBaseIdManual()
         {
-            return GetVariable(KnowledgeBaseId);
+            return GetVariable(KnowledgeBaseIdManual);
+        }
+
+        public static string GetKnowledgeBaseIdTickets()
+        {
+            return GetVariable(KnowledgeBaseIdTickets);
         }
 
         public static string GetModelId()

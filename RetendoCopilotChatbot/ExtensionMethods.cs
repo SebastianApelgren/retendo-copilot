@@ -38,27 +38,50 @@ namespace RetendoCopilotChatbot
                         }
                     };
 
+                    //adds the documents and tickets to the message
                     if (chatMessage.Documents != null)
                     {
                         byte[] byteArray = Encoding.UTF8.GetBytes(chatMessage.Documents);
 
-                        MemoryStream stream = new MemoryStream(byteArray);
-
-                        DocumentSource documentSource = new DocumentSource
+                        using (MemoryStream stream = new MemoryStream(byteArray))
                         {
-                            Bytes = stream,
-                        };
-
-                        content.Add(new ContentBlock
-                        {
-                            Document = new DocumentBlock
+                            DocumentSource documentSource = new DocumentSource
                             {
-                                Name = $"Relevant dokumentation (id {Guid.NewGuid()})",
-                                Format = "txt",
-                                Source = documentSource,
-                            },
+                                Bytes = stream,
+                            };
 
-                        });
+                            content.Add(new ContentBlock
+                            {
+                                Document = new DocumentBlock
+                                {
+                                    Name = $"Relevant dokumentation (id {Guid.NewGuid()})",
+                                    Format = "txt",
+                                    Source = documentSource,
+                                },
+                            });
+                        }
+                    }
+                    if (chatMessage.Tickets != null)
+                    {
+                        byte[] byteArray = Encoding.UTF8.GetBytes(chatMessage.Tickets);
+
+                        using (MemoryStream stream = new MemoryStream(byteArray))
+                        {
+                            DocumentSource documentSource = new DocumentSource
+                            {
+                                Bytes = stream,
+                            };
+
+                            content.Add(new ContentBlock
+                            {
+                                Document = new DocumentBlock
+                                {
+                                    Name = $"Relevanta kundarenden (id {Guid.NewGuid()})",
+                                    Format = "txt",
+                                    Source = documentSource,
+                                },
+                            });
+                        }
                     }
 
                     messages.Add(new Message
@@ -83,6 +106,16 @@ namespace RetendoCopilotChatbot
                 }
             }
             return messages;
+        }
+
+        public static List<ChatMessage> RemoveDocumentsAndTickets(this List<ChatMessage> chatMessages)
+        {
+            foreach (ChatMessage chatMessage in chatMessages)
+            {
+                chatMessage.Documents = null;
+                chatMessage.Tickets = null;
+            }
+            return chatMessages;
         }
     }
 }

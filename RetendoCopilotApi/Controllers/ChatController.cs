@@ -19,7 +19,8 @@ namespace RetendoCopilotApi.Controllers
             AwsHelper awsHelper = new AwsHelper(
                 EnvironmentVariableHelper.GetModelId(),
                 EnvironmentVariableHelper.GetRegion(),
-                EnvironmentVariableHelper.GetKnowledgeBaseId(),
+                EnvironmentVariableHelper.GetKnowledgeBaseIdManual(),
+                EnvironmentVariableHelper.GetKnowledgeBaseIdTickets(),
                 EnvironmentVariableHelper.GetAwsAccessKey(),
                 EnvironmentVariableHelper.GetAwsSecretAccessKey()
             );

@@ -21,28 +21,126 @@ namespace RetendoCopilotChatbot
         {
             string prompt = Prompts.ChatbotSystemPrompt;
 
-            bool shouldUseContexts = await GetShouldSearchInDocumentationAsync(query);
+            string shouldUseContexts = await GetShouldSearchInDocumentationOrShouldAnswerAsync(query);
 
             List<string> contexts = new List<string>();
 
-            if (shouldUseContexts) contexts = await awsHelper.RetrieveAsync(query, 5);
+            int numberOfResults = 5;
 
-            chatMessages.Add(ChatMessage.CreateFromUser(query, shouldUseContexts ? contexts.CreateContextChunk() : null));
+            if (shouldUseContexts == "olämpligt")
+            {
+                return "Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan dem hjälpa dig.";
+                //chatMessages.Add(ChatMessage.CreateFromUser(query, null, null));
+            }
+            else if (shouldUseContexts == "ja")
+            {
+                chatMessages.RemoveDocumentsAndTickets();
+                contexts = await awsHelper.RetrieveAsync(query, numberOfResults);
+                chatMessages.Add(ChatMessage.CreateFromUser(query, contexts.GetRange(0, numberOfResults).CreateContextChunk(), contexts.GetRange(numberOfResults, numberOfResults).CreateContextChunk()));
+            }
+            else
+                chatMessages.Add(ChatMessage.CreateFromUser(query, null, null));
 
             ChatMessage response = await awsHelper.GenerateConversationResponseAsync(chatMessages, prompt);
 
+            string oldResponse = response.Content;
+
+            response.Content = await RewriteResponseAsync(response.Content);
+
             chatMessages.Add(response);
+
+            Console.WriteLine($"Before rewriting: {oldResponse}");
+            Console.WriteLine();
 
             return response.Content;
         }
 
-        public async Task<bool> GetShouldSearchInDocumentationAsync(string query)
+        public async Task<string> GetChatResponseTimedAsync(string query, List<ChatMessage> chatMessages)
         {
-            string prompt= string.Format(Prompts.DocumentNeededPrompt, query);
+            string prompt = Prompts.ChatbotSystemPrompt;
+
+            var watch = Stopwatch.StartNew();
+            var watch2 = Stopwatch.StartNew();
+
+            watch.Start();
+            watch2.Start();
+
+            string shouldUseContexts = await GetShouldSearchInDocumentationOrShouldAnswerAsync(query);
+
+            watch2.Stop();
+            Console.WriteLine($"Time to get shouldUseContexts: {watch2.ElapsedMilliseconds} ms");
+
+            watch2.Restart();
+            watch2.Start();
+
+            List<string> contexts = new List<string>();
+
+            int numberOfResults = 5;
+
+            if(shouldUseContexts == "olämpligt")
+            {
+                return "Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan dem hjälpa dig.";
+                //chatMessages.Add(ChatMessage.CreateFromUser(query, null, null));
+            }
+            else if (shouldUseContexts == "ja")
+            {
+                chatMessages.RemoveDocumentsAndTickets();
+                contexts = await awsHelper.RetrieveAsync(query, numberOfResults);
+                chatMessages.Add(ChatMessage.CreateFromUser(query, contexts.GetRange(0, numberOfResults).CreateContextChunk(), contexts.GetRange(numberOfResults, numberOfResults).CreateContextChunk()));
+            }
+            else
+                chatMessages.Add(ChatMessage.CreateFromUser(query, null, null));
+
+            watch2.Stop();
+            Console.WriteLine($"Time to retrieve contexts: {watch2.ElapsedMilliseconds} ms");
+
+            watch2.Restart();
+            watch2.Start();
+
+            ChatMessage response = await awsHelper.GenerateConversationResponseAsync(chatMessages, prompt);
+
+            string oldResponse = response.Content;
+
+            watch2.Stop();
+            Console.WriteLine($"Time to generate response: {watch2.ElapsedMilliseconds} ms");
+
+            watch2.Restart();
+            watch2.Start();
+
+            response.Content = await RewriteResponseAsync(response.Content);
+
+            watch2.Stop();
+            Console.WriteLine($"Time to rewrite response: {watch2.ElapsedMilliseconds} ms");
+
+            chatMessages.Add(response);
+
+            watch.Stop();
+            Console.WriteLine($"Total time for query: {watch.ElapsedMilliseconds} ms");
+
+            Console.WriteLine();
+            Console.WriteLine($"Before rewriting: {oldResponse}");
+            Console.WriteLine();
+
+            return response.Content;
+        }
+
+        public async Task<string> GetShouldSearchInDocumentationOrShouldAnswerAsync(string query)
+        {
+            string prompt = string.Format(Prompts.DocumentNeededPrompt, query);
 
             InvokeModelResult result = await awsHelper.GenerateResponseAsync(prompt);
 
-            return !(result.MessageText == "nej");
+            return result.MessageText;
         }
+
+        public async Task<string> RewriteResponseAsync(string response)
+        {
+            string prompt = string.Format(Prompts.RewriteResponsePrompt2, response);
+
+            InvokeModelResult result = await awsHelper.GenerateResponseAsync(prompt);
+
+            return result.MessageText;
+        }
+
     }
 }
