@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -46,6 +47,14 @@ Efter att du har bearbetat meddelandet, avgör om det måste ändras, oftast beh
         public const string RewriteResponsePrompt2 = @"Du ska kolla i följande meddelande om det finns känslig personinformation som namn, personnummer eller annat. 
 Du ska svara med exakt samma meddelande som finns nedan med den ända ändringen du få göra är att ta bort känsliga personuppgifter. 
 Om du hittar personuppgifter ska du ersätta det med BORTAGEN. Du ska alltså svara med exakt samma text annars.
+<meddelande>
+{0}
+</meddelande>
+";
+
+        public const string RewriteResponsePrompt3 = @"Du ska kolla i följande meddelande om det finns känslig personinformation som namn, personnummer eller annat.
+Skulle det finnas personlig information såsom namn, personnummer, telefonnummer, e-postadresser eller andra personliga identifierare, ska du svara med 'ja'. Annars, svara med 'nej'.
+Svara bara med ett av de två orden.
 <meddelande>
 {0}
 </meddelande>

@@ -34,7 +34,7 @@ namespace RetendoCopilotChatbot
             }
             else if (shouldUseContexts == "ja")
             {
-                chatMessages.RemoveDocumentsAndTickets();
+                chatMessages.RemoveDocumentsAndTickets(); //removes old documents and tickets as only 5 documents/tickets can be sent at a time.
                 contexts = await awsHelper.RetrieveAsync(query, numberOfResults);
                 chatMessages.Add(ChatMessage.CreateFromUser(query, contexts.GetRange(0, numberOfResults).CreateContextChunk(), contexts.GetRange(numberOfResults, numberOfResults).CreateContextChunk()));
             }
@@ -45,7 +45,13 @@ namespace RetendoCopilotChatbot
 
             string oldResponse = response.Content;
 
-            response.Content = await RewriteResponseAsync(response.Content);
+            bool isSensitive = await IsSensitiveInformation(response.Content);
+
+            if (isSensitive)
+            {
+                chatMessages.RemoveAt(chatMessages.Count - 1);
+                return "Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan dem hjälpa dig.";
+            }
 
             chatMessages.Add(response);
 
@@ -77,14 +83,16 @@ namespace RetendoCopilotChatbot
 
             int numberOfResults = 5;
 
-            if(shouldUseContexts == "olämpligt")
+            shouldUseContexts = "ja";
+
+            if (shouldUseContexts == "olämpligt")
             {
-                return "Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan dem hjälpa dig.";
-                //chatMessages.Add(ChatMessage.CreateFromUser(query, null, null));
+                //return "Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan dem hjälpa dig.";
+                chatMessages.Add(ChatMessage.CreateFromUser(query, null, null));
             }
             else if (shouldUseContexts == "ja")
             {
-                chatMessages.RemoveDocumentsAndTickets();
+                chatMessages.RemoveDocumentsAndTickets(); //removes old documents and tickets as only 5 documents/tickets can be sent at a time.
                 contexts = await awsHelper.RetrieveAsync(query, numberOfResults);
                 chatMessages.Add(ChatMessage.CreateFromUser(query, contexts.GetRange(0, numberOfResults).CreateContextChunk(), contexts.GetRange(numberOfResults, numberOfResults).CreateContextChunk()));
             }
@@ -107,10 +115,16 @@ namespace RetendoCopilotChatbot
             watch2.Restart();
             watch2.Start();
 
-            response.Content = await RewriteResponseAsync(response.Content);
+            bool isSensitive = await IsSensitiveInformation(response.Content);
+
+            if (isSensitive)
+            {
+                chatMessages.RemoveAt(chatMessages.Count - 1);
+                return "Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan dem hjälpa dig.";
+            }
 
             watch2.Stop();
-            Console.WriteLine($"Time to rewrite response: {watch2.ElapsedMilliseconds} ms");
+            Console.WriteLine($"Time to check if sensitive response: {watch2.ElapsedMilliseconds} ms");
 
             chatMessages.Add(response);
 
@@ -133,13 +147,13 @@ namespace RetendoCopilotChatbot
             return result.MessageText;
         }
 
-        public async Task<string> RewriteResponseAsync(string response)
+        public async Task<bool> IsSensitiveInformation(string text)
         {
-            string prompt = string.Format(Prompts.RewriteResponsePrompt2, response);
+            string prompt = string.Format(Prompts.RewriteResponsePrompt3, text);
 
             InvokeModelResult result = await awsHelper.GenerateResponseAsync(prompt);
 
-            return result.MessageText;
+            return result.MessageText == "ja";
         }
 
     }
