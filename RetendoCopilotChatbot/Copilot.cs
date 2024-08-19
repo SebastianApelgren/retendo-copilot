@@ -27,9 +27,9 @@ namespace RetendoCopilotChatbot
 
             int numberOfResults = 5;
 
-            if (queryVerdict == "olämpligt")
+            if (queryVerdict.Contains("olämpligt"))
             {
-                return new ChatResponse("Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan dem hjälpa dig.", timingInformation);
+                return new ChatResponse("Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan de hjälpa dig.", timingInformation);
             }
             else if (queryVerdict == "ja")
             {
@@ -66,7 +66,7 @@ namespace RetendoCopilotChatbot
             if (isSensitive)
             {
                 chatMessages.RemoveAt(chatMessages.Count - 1);
-                return new ChatResponse("Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan dem hjälpa dig.", timingInformation);
+                return new ChatResponse("Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan de hjälpa dig.", timingInformation);
             }
 
             chatMessages.Add(response);
