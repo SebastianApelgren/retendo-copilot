@@ -23,7 +23,7 @@ Kom ihåg att alltid hålla dig till den information som finns i dokumentationen
         public const string DocumentNeededAndRelevantQuestionPrompt = @"Du hjälper till att avgöra om en chatbot behöver söka i dokumentationen för att svara på en användarfråga och om användarfrågan är lämplig att svara på.
 Oftast ska dokumentationen användas men om användaren bara refererar till ett tidigare meddelande eller säger något som inte är en fråga behöver inte dokumentationen användas.
 Om du tror att svaret på användarens fråga finns i dokumentationen, svara 'ja'. Annars, svara 'nej'. 
-Skulle användaren fråga om känslig information såsom till exemple namn, telefonnummer, personuppgiften eller något annat som inte är lämpligt att svara på, svara 'olämpligt'.
+Skulle användaren fråga om känslig information såsom till exempel namn, telefonnummer, personuppgiften eller något annat som inte är lämpligt att svara på, svara 'olämpligt'.
 Svara bara med ett av de tre orden.
 <användarens fråga>
 {0}

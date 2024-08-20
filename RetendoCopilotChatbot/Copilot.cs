@@ -25,7 +25,7 @@ namespace RetendoCopilotChatbot
 
             List<string> contexts = new List<string>();
 
-            int numberOfResults = 5;
+            int numberOfResults = 3;
 
             if (queryVerdict.Contains("olämpligt"))
             {
@@ -52,8 +52,10 @@ namespace RetendoCopilotChatbot
                 
                 timingInformation.RegisterTiming(retrieveContextTime, "retrieve context");
             }
-            else
+            else if (queryVerdict == "nej")
                 chatMessages.Add(ChatMessage.CreateFromUser(query, null, null));
+            else
+                return new ChatResponse("Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan de hjälpa dig.", timingInformation);
 
             Stopwatch generateResponseWatch = Stopwatch.StartNew();
             ChatMessage response = await awsHelper.GenerateConversationResponseAsync(chatMessages, prompt);
