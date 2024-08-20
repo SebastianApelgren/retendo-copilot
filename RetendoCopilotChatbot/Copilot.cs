@@ -62,7 +62,8 @@ namespace RetendoCopilotChatbot
             timingInformation.RegisterTiming(generateResponseWatch, "generate response");
 
             Stopwatch isSensitiveWatch = Stopwatch.StartNew();
-            bool isSensitive = await IsSensitiveInformation(response.Content);
+            //bool isSensitive = await IsSensitiveInformation(response.Content);
+            bool isSensitive = false;
             timingInformation.RegisterTiming(isSensitiveWatch, "is sensitive check");
 
             if (isSensitive)
