@@ -11,10 +11,14 @@ namespace RetendoCopilotChatbot.Models
         [JsonPropertyName("timingInformation")]
         public TimingInformation TimingInformation { get; set; }
 
-        public ChatResponse(string message, TimingInformation timingInformation)
+        [JsonPropertyName("costInformation")]
+        public CostInformation CostInformation { get; set; }
+
+        public ChatResponse(string message, TimingInformation timingInformation, CostInformation costInformation)
         {
             Message = message;
             TimingInformation = timingInformation;
+            CostInformation = costInformation;
         }
 
         public override string ToString()
@@ -29,6 +33,12 @@ namespace RetendoCopilotChatbot.Models
                 stringBuilder.AppendLine(timingEntry.ToString());
             }
             stringBuilder.AppendLine("</timing information>");
+
+            stringBuilder.AppendLine();
+
+            stringBuilder.AppendLine("<cost information>");
+            stringBuilder.AppendLine(CostInformation.ToString());
+            stringBuilder.AppendLine("</cost information>");
 
             return stringBuilder.ToString();
         }

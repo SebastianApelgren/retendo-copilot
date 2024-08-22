@@ -8,6 +8,9 @@ namespace RetendoCopilotApi.Models
         [JsonPropertyName("responseMessage")]
         public string ResponseMessage { get; set; }
 
+        [JsonPropertyName("costInformation")]
+        public CostInformation CostInformation { get; set; }
+
         [JsonPropertyName("timings")]
         public List<TimingEntry> Timings { get; set; }
 
@@ -15,17 +18,19 @@ namespace RetendoCopilotApi.Models
         public string Context { get; set; }
 
         [JsonConstructor]
-        public OutputBody(string responseMessage, List<TimingEntry> timings, string context)
+        public OutputBody(string responseMessage, List<TimingEntry> timings, string context, CostInformation costInformation)
         {
             ResponseMessage = responseMessage;
             Timings = timings;
             Context = context;
+            CostInformation = costInformation;
         }
 
         public OutputBody(ChatResponse response, string context)
         {
             ResponseMessage = response.Message;
             Timings = response.TimingInformation.Timings;
+            CostInformation = response.CostInformation;
             Context = context;
         }
     }

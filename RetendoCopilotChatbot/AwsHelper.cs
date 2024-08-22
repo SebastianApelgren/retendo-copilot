@@ -97,14 +97,16 @@ namespace RetendoCopilotChatbot
             }
         }
 
-        public async Task<ChatMessage> GenerateConversationResponseAsync(List<ChatMessage> chatMessages, string prompt)
+        public async Task<ConversationResponse> GenerateConversationResponseAsync(List<ChatMessage> chatMessages, string prompt)
         {
             ConverseRequest converseRequest = CreateConverseRequest(chatMessages, prompt);
             ConverseResponse response = await runtimeClient.ConverseAsync(converseRequest);
 
             ChatMessage assistantResponse = ChatMessage.CreateFromAssistant(response.Output.Message.Content[0].Text);
 
-            return assistantResponse;
+            ConversationResponse conversationResponse= new ConversationResponse(assistantResponse, response.Usage.OutputTokens, response.Usage.InputTokens);
+
+            return conversationResponse;
         }
 
         private ConverseRequest CreateConverseRequest(List<ChatMessage> chatMessages, string prompt)

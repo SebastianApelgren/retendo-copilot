@@ -17,11 +17,14 @@ namespace RetendoCopilotChatbot
             TimingInformation timingInformation = new TimingInformation();
             Stopwatch totalTimeWatch = Stopwatch.StartNew();
 
+            CostInformation costInformation = new CostInformation();
+
             string prompt = Prompts.ChatbotSystemPrompt;
 
             Stopwatch queryVerdictStopwatch = Stopwatch.StartNew();
-            string queryVerdict = await GetShouldSearchInDocumentationOrShouldAnswerAsync(query);
+            string queryVerdict = await GetShouldSearchInDocumentationOrShouldAnswerAsync(query, costInformation);
             timingInformation.RegisterTiming(queryVerdictStopwatch, "query initial validation");
+
 
             List<string> contexts = new List<string>();
 
@@ -29,7 +32,7 @@ namespace RetendoCopilotChatbot
 
             if (queryVerdict.Contains("olämpligt"))
             {
-                return new ChatResponse("Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan de hjälpa dig.", timingInformation);
+                return new ChatResponse("Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan de hjälpa dig.", timingInformation, costInformation);
             }
             else if (queryVerdict == "ja")
             {
@@ -55,11 +58,12 @@ namespace RetendoCopilotChatbot
             else if (queryVerdict == "nej")
                 chatMessages.Add(ChatMessage.CreateFromUser(query, null, null));
             else
-                return new ChatResponse("Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan de hjälpa dig.", timingInformation);
+                return new ChatResponse("Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan de hjälpa dig.", timingInformation, costInformation);
 
             Stopwatch generateResponseWatch = Stopwatch.StartNew();
-            ChatMessage response = await awsHelper.GenerateConversationResponseAsync(chatMessages, prompt);
+            ConversationResponse response = await awsHelper.GenerateConversationResponseAsync(chatMessages, prompt);
             timingInformation.RegisterTiming(generateResponseWatch, "generate response");
+            costInformation.AddTokens(response.inputTokens, response.outputTokens);
 
             Stopwatch isSensitiveWatch = Stopwatch.StartNew();
             //bool isSensitive = await IsSensitiveInformation(response.Content);
@@ -69,21 +73,23 @@ namespace RetendoCopilotChatbot
             if (isSensitive)
             {
                 chatMessages.RemoveAt(chatMessages.Count - 1);
-                return new ChatResponse("Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan de hjälpa dig.", timingInformation);
+                return new ChatResponse("Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan de hjälpa dig.", timingInformation, costInformation);
             }
 
-            chatMessages.Add(response);
+            chatMessages.Add(response.ChatMessage);
 
             timingInformation.RegisterTiming(totalTimeWatch, "total time");
 
-            return new ChatResponse(response.Content, timingInformation);
+            return new ChatResponse(response.ChatMessage.Content, timingInformation, costInformation);
         }
 
-        public async Task<string> GetShouldSearchInDocumentationOrShouldAnswerAsync(string query)
+        public async Task<string> GetShouldSearchInDocumentationOrShouldAnswerAsync(string query, CostInformation costInformation)
         {
             string prompt = string.Format(Prompts.DocumentNeededAndRelevantQuestionPrompt, query);
 
             InvokeModelResult result = await awsHelper.GenerateResponseAsync(prompt);
+
+            costInformation.CountAndAddTokens(prompt, result.MessageText);
 
             return result.MessageText;
         }
