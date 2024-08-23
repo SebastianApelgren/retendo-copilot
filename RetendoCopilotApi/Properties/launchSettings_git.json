@@ -19,6 +19,8 @@
         "REGION": "region",
         "KNOWLEDGE_BASE_ID_MANUAL": "KnowledgeBaseIdManual",
         "KNOWLEDGE_BASE_ID_TICKETS": "KnowledgeBaseIdTickets",
+        "GUARDRAIL_IDENTIFIER": "GuardrailIdentifier",
+        "GUARDRAIL_VERSION": "GuardrailVersion",
         "AWS_ACCESS_KEY_ID": "AccessKey",
         "AWS_SECRET_ACCESS_KEY": "SecretAccessKey",
         "ASPNETCORE_ENVIRONMENT": "Development"

@@ -21,7 +21,9 @@ namespace RetendoCopilotApi.Controllers
                 EnvironmentVariableHelper.GetKnowledgeBaseIdManual(),
                 EnvironmentVariableHelper.GetKnowledgeBaseIdTickets(),
                 EnvironmentVariableHelper.GetAwsAccessKey(),
-                EnvironmentVariableHelper.GetAwsSecretAccessKey()
+                EnvironmentVariableHelper.GetAwsSecretAccessKey(),
+                EnvironmentVariableHelper.GetGuardrailIdentifier(),
+                EnvironmentVariableHelper.GetGuardrailVersion()
             );
 
             Copilot copilot = new Copilot(awsHelper);

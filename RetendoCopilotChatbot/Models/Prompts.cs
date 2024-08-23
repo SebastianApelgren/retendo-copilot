@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Amazon.Runtime.Internal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -25,6 +26,13 @@ Oftast ska dokumentationen användas men om användaren bara refererar till ett 
 Om du tror att svaret på användarens fråga finns i dokumentationen, svara 'ja'. Annars, svara 'nej'. 
 Skulle användaren fråga om känslig information såsom till exempel namn, telefonnummer, personuppgiften eller något annat som inte är lämpligt att svara på, svara 'olämpligt'.
 Svara bara med ett av de tre orden.
+<användarens fråga>
+{0}
+</användarens fråga>";
+
+        public const string DocumentNeededPrompt = @"Du hjälper till att avgöra om en chatbot behöver söka i dokumentationen för att svara på en användarfråga.
+Oftast ska dokumentationen användas men om användaren bara refererar till ett tidigare meddelande eller säger något som inte är en fråga behöver inte dokumentationen användas.
+Om du tror att svaret på användarens fråga finns i dokumentationen, svara 'ja'. Annars, svara 'nej'. Svara bara med ett av de två orden.
 <användarens fråga>
 {0}
 </användarens fråga>";

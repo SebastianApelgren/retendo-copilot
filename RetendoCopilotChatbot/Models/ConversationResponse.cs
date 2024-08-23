@@ -13,11 +13,15 @@ namespace RetendoCopilotChatbot.Models
         [JsonPropertyName("costInformation")]
         public double inputTokens { get; set; }
 
-        public ConversationResponse(ChatMessage chatMessage, double outputTokens, double inputTokens)
+        [JsonPropertyName("guardailIntervened")]
+        public bool guardrailIntervened { get; set; }
+
+        public ConversationResponse(ChatMessage chatMessage, double outputTokens, double inputTokens, bool guardrailIntervened)
         {
             ChatMessage = chatMessage;
             this.outputTokens = outputTokens;
             this.inputTokens = inputTokens;
+            this.guardrailIntervened = guardrailIntervened;
         }
 
     }

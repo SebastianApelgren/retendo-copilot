@@ -13,21 +13,25 @@ namespace RetendoCopilotChatbot
     {
         private string knowledgeBaseIdManual;
         private string knowledgeBaseIdTicket;
+        private string guardrailIdentifier;
+        private string guardrailVersion;
         private string modelId;
         private AmazonBedrockAgentRuntimeClient client;
         private AmazonBedrockRuntimeClient runtimeClient;
 
-        public AwsHelper(string modId, string region, string kbIdManual, string kbIdTicket, string awsAccessKeyId, string awsSecretAccessKey)
+        public AwsHelper(string modId, string region, string kbIdManual, string kbIdTicket, string awsAccessKeyId, string awsSecretAccessKey, string guardrailIdentifier, string guardrailVersion)
         {
             modelId = modId;
             knowledgeBaseIdManual = kbIdManual;
             knowledgeBaseIdTicket = kbIdTicket;
+            this.guardrailIdentifier = guardrailIdentifier;
+            this.guardrailVersion = guardrailVersion;
 
             client = new AmazonBedrockAgentRuntimeClient(awsAccessKeyId, awsSecretAccessKey, RegionEndpoint.GetBySystemName(region));
             runtimeClient = new AmazonBedrockRuntimeClient(awsAccessKeyId, awsSecretAccessKey, RegionEndpoint.GetBySystemName(region));
         }
 
-        public async Task<List<string>> RetrieveAsync(string query, int numberOfResults = 5)
+        public async Task<List<string>> RetrieveAsync(string query, int numberOfResultsManuals, int numberOfResultsTickets)
         {
             RetrieveRequest retrieveRequestManual = new RetrieveRequest
             {
@@ -35,7 +39,7 @@ namespace RetendoCopilotChatbot
                 {
                     VectorSearchConfiguration = new KnowledgeBaseVectorSearchConfiguration
                     {
-                        NumberOfResults = numberOfResults,
+                        NumberOfResults = numberOfResultsManuals,
                     },
                 },
                 KnowledgeBaseId = knowledgeBaseIdManual,
@@ -51,7 +55,7 @@ namespace RetendoCopilotChatbot
                 {
                     VectorSearchConfiguration = new KnowledgeBaseVectorSearchConfiguration
                     {
-                        NumberOfResults = numberOfResults,
+                        NumberOfResults = numberOfResultsTickets,
                     },
                 },
                 KnowledgeBaseId = knowledgeBaseIdTicket,
@@ -104,7 +108,12 @@ namespace RetendoCopilotChatbot
 
             ChatMessage assistantResponse = ChatMessage.CreateFromAssistant(response.Output.Message.Content[0].Text);
 
-            ConversationResponse conversationResponse= new ConversationResponse(assistantResponse, response.Usage.OutputTokens, response.Usage.InputTokens);
+            bool guardail_intervened = false;
+
+            if (response.StopReason.Value == "guardrail_intervened")
+                guardail_intervened = true;
+
+            ConversationResponse conversationResponse= new ConversationResponse(assistantResponse, response.Usage.OutputTokens, response.Usage.InputTokens, guardail_intervened);
 
             return conversationResponse;
         }
@@ -122,12 +131,19 @@ namespace RetendoCopilotChatbot
                 Temperature = .5f,
             };
 
+            Amazon.BedrockRuntime.Model.GuardrailConfiguration guardrailConfig = new Amazon.BedrockRuntime.Model.GuardrailConfiguration
+            {
+                GuardrailIdentifier = guardrailIdentifier,
+                GuardrailVersion = guardrailVersion
+            };
+
             ConverseRequest converseRequest = new ConverseRequest
             {
                 ModelId = modelId,
                 System = new List<SystemContentBlock> { systemPrompt },
                 Messages = chatMessages.ToAwsMessages(),
                 InferenceConfig = inferenceConfig,
+                GuardrailConfig = guardrailConfig,
             };
 
             return converseRequest;

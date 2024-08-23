@@ -8,6 +8,8 @@
         private const string Region = "REGION";
         private const string KnowledgeBaseIdManual = "KNOWLEDGE_BASE_ID_MANUAL";
         private const string KnowledgeBaseIdTickets = "KNOWLEDGE_BASE_ID_TICKETS";
+        private const string GuardrailIdentifier = "GUARDRAIL_IDENTIFIER";
+        private const string GuardrailVersion = "GUARDRAIL_VERSION";
 
         public static string GetAwsAccessKey()
         {
@@ -17,6 +19,16 @@
         public static string GetAwsSecretAccessKey()
         {
             return GetVariable(AwsSecretAccessKey);
+        }
+
+        public static string GetGuardrailIdentifier()
+        {
+            return GetVariable(GuardrailIdentifier);
+        }
+
+        public static string GetGuardrailVersion()
+        {
+            return GetVariable(GuardrailVersion);
         }
 
         public static string GetKnowledgeBaseIdManual()

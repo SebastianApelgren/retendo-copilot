@@ -12,7 +12,7 @@ namespace RetendoCopilotChatbot
             this.awsHelper = awsHelper;
         }
 
-        public async Task<ChatResponse> GetChatResponseAsync(string query, List<ChatMessage> chatMessages)
+        public async Task<ChatResponse> GetChatResponseAsync(string query, List<ChatMessage> chatMessages, int numberOfResultsManuals = 3, int numberOfResultsTickets = 3)
         {
             TimingInformation timingInformation = new TimingInformation();
             Stopwatch totalTimeWatch = Stopwatch.StartNew();
@@ -22,13 +22,11 @@ namespace RetendoCopilotChatbot
             string prompt = Prompts.ChatbotSystemPrompt;
 
             Stopwatch queryVerdictStopwatch = Stopwatch.StartNew();
-            string queryVerdict = await GetShouldSearchInDocumentationOrShouldAnswerAsync(query, costInformation);
+            string queryVerdict = await GetShouldSearchInDocumentationAsync(query, costInformation);
             timingInformation.RegisterTiming(queryVerdictStopwatch, "query initial validation");
 
 
             List<string> contexts = new List<string>();
-
-            int numberOfResults = 3;
 
             if (queryVerdict.Contains("olämpligt"))
             {
@@ -39,18 +37,18 @@ namespace RetendoCopilotChatbot
                 Stopwatch retrieveContextTime = Stopwatch.StartNew();
                 
                 chatMessages.RemoveDocumentsAndTickets(); //removes old documents and tickets as only 5 documents/tickets can be sent at a time.
-                contexts = await awsHelper.RetrieveAsync(query, numberOfResults);
+                contexts = await awsHelper.RetrieveAsync(query, numberOfResultsManuals, numberOfResultsTickets);
 
                 try
                 {
-                    List<string> documents = contexts.GetRange(0, numberOfResults);
-                    List<string> tickets = contexts.GetRange(numberOfResults, numberOfResults);
+                    List<string> documents = contexts.GetRange(0, numberOfResultsManuals);
+                    List<string> tickets = contexts.GetRange(numberOfResultsManuals, numberOfResultsTickets);
 
                     chatMessages.Add(ChatMessage.CreateFromUser(query, documents.CreateContextChunk(), tickets.CreateContextChunk()));
                 }
                 catch(IndexOutOfRangeException)
                 {
-                    throw new InvalidDataException($"Tried to get documents and tickets but the list of fetched contexts did not contain them the expected amount of documents/tickets. Expected amount: {numberOfResults * 2}, actual amount: {contexts.Count}. Something may be wrong when fetching contexts or the appropriate contexts are not in aws.");
+                    throw new InvalidDataException($"Tried to get documents and tickets but the list of fetched contexts did not contain them the expected amount of documents/tickets. Expected amount: {numberOfResultsManuals + numberOfResultsTickets}, actual amount: {contexts.Count}. Something may be wrong when fetching contexts or the appropriate contexts are not in aws.");
                 }
                 
                 timingInformation.RegisterTiming(retrieveContextTime, "retrieve context");
@@ -65,22 +63,25 @@ namespace RetendoCopilotChatbot
             timingInformation.RegisterTiming(generateResponseWatch, "generate response");
             costInformation.AddTokens(response.inputTokens, response.outputTokens);
 
-            Stopwatch isSensitiveWatch = Stopwatch.StartNew();
-            //bool isSensitive = await IsSensitiveInformation(response.Content);
-            bool isSensitive = false;
-            timingInformation.RegisterTiming(isSensitiveWatch, "is sensitive check");
-
-            if (isSensitive)
-            {
+            if (response.guardrailIntervened)
                 chatMessages.RemoveAt(chatMessages.Count - 1);
-                return new ChatResponse("Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan de hjälpa dig.", timingInformation, costInformation);
-            }
-
-            chatMessages.Add(response.ChatMessage);
+            else
+                chatMessages.Add(response.ChatMessage);
 
             timingInformation.RegisterTiming(totalTimeWatch, "total time");
 
             return new ChatResponse(response.ChatMessage.Content, timingInformation, costInformation);
+        }
+
+        public async Task<string> GetShouldSearchInDocumentationAsync(string query, CostInformation costInformation)
+        {
+            string prompt = string.Format(Prompts.DocumentNeededPrompt, query);
+
+            InvokeModelResult result = await awsHelper.GenerateResponseAsync(prompt);
+
+            costInformation.CountAndAddTokens(prompt, result.MessageText);
+
+            return result.MessageText;
         }
 
         public async Task<string> GetShouldSearchInDocumentationOrShouldAnswerAsync(string query, CostInformation costInformation)
