@@ -12,7 +12,7 @@ namespace RetendoCopilotChatbot
             this.awsHelper = awsHelper;
         }
 
-        public async Task<ChatResponse> GetChatResponseAsync(string query, List<ChatMessage> chatMessages, int numberOfResultsManuals = 3, int numberOfResultsTickets = 3)
+        public async Task<ChatResponse> GetChatResponseAsync(string query, List<ChatMessage> chatMessages, int numberOfResultsManuals = 3, int numberOfResultsTickets = 5)
         {
             TimingInformation timingInformation = new TimingInformation();
             Stopwatch totalTimeWatch = Stopwatch.StartNew();
