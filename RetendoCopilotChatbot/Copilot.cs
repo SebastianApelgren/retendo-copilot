@@ -25,7 +25,6 @@ namespace RetendoCopilotChatbot
             string queryVerdict = await GetShouldSearchInDocumentationAsync(query, costInformation);
             timingInformation.RegisterTiming(queryVerdictStopwatch, "query initial validation");
 
-
             List<string> contexts = new List<string>();
 
             if (queryVerdict.Contains("olämpligt"))

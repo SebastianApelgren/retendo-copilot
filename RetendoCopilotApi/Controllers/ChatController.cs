@@ -28,7 +28,7 @@ namespace RetendoCopilotApi.Controllers
 
             Copilot copilot = new Copilot(awsHelper);
 
-            ChatResponse response = await copilot.GetChatResponseAsync(body.UserMessage, chatMessages);
+            ChatResponse response = await copilot.GetChatResponseAsync(body.UserMessage, chatMessages, body.NumberOfResultsManuals, body.NumberOfResultsTickets);
 
             string serializedContext = ContextHelper.SerializeAndConvertToBase64(chatMessages);
 
