@@ -14,10 +14,6 @@ namespace RetendoCopilotChatbot
 
         public async static Task Main(string[] args)
         {
-
-            Test().Wait();
-
-
             string awsAccessKeyId = SecretManager.GetAwsAccessKey();
             string awsSecretAccessKey = SecretManager.GetAwsSecretAccessKey();
 
