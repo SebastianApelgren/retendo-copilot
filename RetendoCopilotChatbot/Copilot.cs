@@ -14,6 +14,9 @@ namespace RetendoCopilotChatbot
 
         public async Task<ChatResponse> GetChatResponseAsync(string query, List<ChatMessage> chatMessages, int numberOfResultsManuals = 3, int numberOfResultsTickets = 5)
         {
+            // This function is responsible for generating a response to a user query. It first determines if the query should be answered by the chatbot or if it should be searched in the documentation.
+            // If the query should be answered, it retrieves the relevant contexts from AWS and generates a response based on those contexts.
+
             TimingInformation timingInformation = new TimingInformation();
             Stopwatch totalTimeWatch = Stopwatch.StartNew();
 
@@ -22,7 +25,7 @@ namespace RetendoCopilotChatbot
             string prompt = Prompts.ChatbotSystemPrompt;
 
             Stopwatch queryVerdictStopwatch = Stopwatch.StartNew();
-            string queryVerdict = await GetShouldSearchInDocumentationAsync(query, costInformation);
+            string queryVerdict = await GetShouldSearchInDocumentationOrShouldAnswerAsync(query, costInformation);
             timingInformation.RegisterTiming(queryVerdictStopwatch, "query initial validation");
 
             List<string> contexts = new List<string>();
@@ -34,8 +37,9 @@ namespace RetendoCopilotChatbot
             else if (queryVerdict == "ja")
             {
                 Stopwatch retrieveContextTime = Stopwatch.StartNew();
-                
-                chatMessages.RemoveDocumentsAndTickets(); //removes old documents and tickets as only 5 documents/tickets can be sent at a time.
+
+                //removes old documents and tickets as only 5 documents/tickets can be sent at a time.
+                chatMessages.RemoveDocumentsAndTickets();
                 contexts = await awsHelper.RetrieveAsync(query, numberOfResultsManuals, numberOfResultsTickets);
 
                 try
@@ -92,15 +96,6 @@ namespace RetendoCopilotChatbot
             costInformation.CountAndAddTokens(prompt, result.MessageText);
 
             return result.MessageText;
-        }
-
-        public async Task<bool> IsSensitiveInformation(string text)
-        {
-            string prompt = string.Format(Prompts.RewriteResponsePrompt3, text);
-
-            InvokeModelResult result = await awsHelper.GenerateResponseAsync(prompt);
-
-            return result.MessageText == "ja";
         }
     }
 }

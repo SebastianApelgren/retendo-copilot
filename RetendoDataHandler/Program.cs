@@ -1,10 +1,6 @@
 ﻿using RetendoDataHandler.Models;
-using System.Text.RegularExpressions;
 using RetendoCopilotChatbot;
 using RetendoDataHandler.Helper;
-using System.Text.Json;
-using Amazon.S3.Model;
-using System.Reflection.Metadata;
 
 namespace RetendoDataHandler
 {
@@ -51,15 +47,3 @@ namespace RetendoDataHandler
         }
     }
 }
-
-
-/*
- * Todo:
- *  - KLAR // lägg till metod i awsHelper så att den laddar direkt upp i S3 bucket
- *  - KLAR // lägg till så att modelen tar 5 sup ärenden och 5 artiklar och gör ett svar.
- *  - KLAR // lägg till så att den tar bort namn från supporttickets. 
- *  - Implementera så att den skickar in response av chatbotten till ett till LLM för att ta bort personuppgifter och skriva om meddelandet så att det är upp to date till dagens datum.
- *  - Fixa så att man kan skicka mer än 5 meddelande med dokument till boten. (kanske ta bort gamla dokument efter 3 meddelanden med dokument)
- *  
- *  
- */
