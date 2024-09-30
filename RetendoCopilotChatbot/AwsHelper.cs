@@ -11,6 +11,8 @@ namespace RetendoCopilotChatbot
 {
     public class AwsHelper
     {
+        // This class is used to interact with the AWS Bedrock API. 
+
         private string knowledgeBaseIdManual;
         private string knowledgeBaseIdTicket;
         private string guardrailIdentifier;
@@ -33,6 +35,8 @@ namespace RetendoCopilotChatbot
 
         public async Task<List<string>> RetrieveAsync(string query, int numberOfResultsManuals, int numberOfResultsTickets)
         {
+            //this function retrieves the relevant contexts from AWS based on the query, that is the tickets and manuals (documents).
+
             RetrieveRequest retrieveRequestManual = new RetrieveRequest
             {
                 RetrievalConfiguration = new KnowledgeBaseRetrievalConfiguration
@@ -90,6 +94,8 @@ namespace RetendoCopilotChatbot
 
         public async Task<InvokeModelResult> GenerateResponseAsync(string query)
         {
+            //this function sends a single prompt to the LLM (large language model), it cannot send a complete conversation. It is used to generate a response to a single query.
+
             InvokeModelRequest invokeModelRequest = CreateInvokeModelRequest(query);
             InvokeModelResponse response = await runtimeClient.InvokeModelAsync(invokeModelRequest);
 
@@ -103,6 +109,8 @@ namespace RetendoCopilotChatbot
 
         public async Task<ConversationResponse> GenerateConversationResponseAsync(List<ChatMessage> chatMessages, string prompt)
         {
+            //this function sends a complete conversation to the LLM (large language model) and gets a response from it.
+
             ConverseRequest converseRequest = CreateConverseRequest(chatMessages, prompt);
             ConverseResponse response = await runtimeClient.ConverseAsync(converseRequest);
 
@@ -120,6 +128,8 @@ namespace RetendoCopilotChatbot
 
         private ConverseRequest CreateConverseRequest(List<ChatMessage> chatMessages, string prompt)
         {
+            //this function creates a ConverseRequest object from a list of chat messages and a prompt to be sent to the conversation API (.converseAsync).
+
             SystemContentBlock systemPrompt = new SystemContentBlock
             {
                 Text = prompt,
@@ -151,6 +161,8 @@ namespace RetendoCopilotChatbot
 
         private InvokeModelRequest CreateInvokeModelRequest(string query, int maxTokens = 4096, double temp = 0.5)
         {
+            //this function creates an InvokeModelRequest object from a query to be sent to the invoke API (.invokeModelAsync).
+
             string nativeRequest = JsonSerializer.Serialize(new
             {
                 anthropic_version = "bedrock-2023-05-31",

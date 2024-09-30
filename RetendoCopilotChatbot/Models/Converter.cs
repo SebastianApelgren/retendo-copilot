@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace RetendoCopilotChatbot.Models
 {
+    //not relevant nor used.
+
     internal static class Converter
     {
         public static readonly JsonSerializerOptions Settings = new(JsonSerializerDefaults.General)

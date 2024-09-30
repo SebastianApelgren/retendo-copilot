@@ -12,6 +12,8 @@ namespace RetendoCopilotChatbot.Models
 {
     public partial class InvokeModelResult
     {
+        //This class is an output from the copilot InvokeModelAsync function.
+
         [JsonPropertyName("id")]
         public string Id { get; set; }
 

@@ -14,6 +14,8 @@ namespace RetendoDataHandler.Helper
 {
     public class AwsS3Helper
     {
+        //This class is used to interact with AWS S3. It can upload support tickets to a specified bucket and create folders in the bucket.
+
         private string region;
         private IAmazonS3 client;
 
@@ -23,7 +25,7 @@ namespace RetendoDataHandler.Helper
 
             AmazonS3Config clientConfig = new AmazonS3Config
             {
-                RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(region), // Replace with your bucket's region
+                RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(region),
                 LogResponse = true,
                 LogMetrics = true,
             };
@@ -31,11 +33,13 @@ namespace RetendoDataHandler.Helper
             client = new AmazonS3Client(awsAccessKey, awsSecretAccessKey, RegionEndpoint.GetBySystemName(region));
         }
 
-        public async Task<bool> UploadToS3(string bucketName, string path, List<SupportTicket> tickets)
+        public async Task<bool> UploadToS3(string bucketName, string pathInBucket, List<SupportTicket> tickets)
         {
-            if (path != "" && !path.EndsWith("/"))
+            //This function uploads the support tickets to the specified bucket and path in bucket in AWS S3.
+
+            if (pathInBucket != "" && !pathInBucket.EndsWith("/"))
             {
-                path += "/";
+                pathInBucket += "/";
             }
 
             foreach (SupportTicket ticket in tickets)
@@ -46,7 +50,7 @@ namespace RetendoDataHandler.Helper
                 PutObjectRequest putRequest = new PutObjectRequest
                 {
                     BucketName = bucketName,
-                    Key = $"{path}{fileName}",
+                    Key = $"{pathInBucket}{fileName}",
                     ContentBody = content,
                     BucketKeyEnabled = true,
                 };
@@ -75,6 +79,8 @@ namespace RetendoDataHandler.Helper
 
         public async Task CreateS3Folder(string bucketName, string path, string name)
         {
+            //This function creates a folder in the specified bucket and path in bucket in AWS S3.
+
             if (path != "" && !path.EndsWith("/"))
             {
                 path += "/";
@@ -93,6 +99,8 @@ namespace RetendoDataHandler.Helper
 
         public async Task<bool> FolderExists(string bucketName, string path, string name)
         {
+            //This function checks if a folder exists in the specified bucket and path in bucket in AWS S3.
+
             ListObjectsRequest request = new ListObjectsRequest()
             {
                 BucketName = bucketName,

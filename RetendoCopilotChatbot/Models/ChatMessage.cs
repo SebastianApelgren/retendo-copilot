@@ -11,6 +11,8 @@ namespace RetendoCopilotChatbot.Models
 {
     public class ChatMessage
     {
+        //This class is used to create a chat message for each interaction between the user and the chatbot. It can contain documents if the role is user.
+
         [JsonPropertyName("content")]
         public string Content { get; set; }
 

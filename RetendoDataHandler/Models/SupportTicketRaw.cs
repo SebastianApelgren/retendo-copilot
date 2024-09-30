@@ -21,6 +21,8 @@ namespace RetendoDataHandler.Models
 
     public partial class SupportTicketRaw
     {
+        //JSON dezerilization for the support ticket raw data.
+
         [JsonPropertyName("subject")]
         public string Subject { get; set; }
 

@@ -11,6 +11,8 @@ namespace RetendoDataHandler
 
         static async Task Main(string[] args)
         {
+            //run this program to upload all support tickets in the Data folder to S3.
+
             string path = "Data";
             string s3Folder = "support-tickets";
 
@@ -30,6 +32,8 @@ namespace RetendoDataHandler
 
         private async static Task<bool> UploadTickets(List<SupportTicket> tickets, string s3Folder)
         {
+            //this function uploads the support tickets to the specified bucket and path in bucket in AWS S3.
+
             string awsAccessKey = SecretManager.GetAwsAccessKey();
             string awsSecretAccessKey = SecretManager.GetAwsSecretAccessKey();
 

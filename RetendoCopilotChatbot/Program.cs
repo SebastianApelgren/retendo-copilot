@@ -5,6 +5,8 @@ namespace RetendoCopilotChatbot
 {
     public class Program
     {
+        //Class to run the chatbot in the console
+
         private const string modelId = "anthropic.claude-3-sonnet-20240229-v1:0";
         private const string region = "eu-west-2";
         private const string kbId_manual = "CJHYRDAGBS";
@@ -45,6 +47,8 @@ namespace RetendoCopilotChatbot
 
         public async static Task Test()
         {
+            //test to send 1000 queries to the knowledge base to see if the OCU went up (this is not a real test). Will not be used by Retendo.
+
             string awsAccessKeyId = SecretManager.GetAwsAccessKey();
             string awsSecretAccessKey = SecretManager.GetAwsSecretAccessKey();
 

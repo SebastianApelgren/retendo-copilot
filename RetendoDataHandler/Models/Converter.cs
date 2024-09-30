@@ -11,6 +11,8 @@ namespace RetendoDataHandler.Models
 {
     internal class Converter
     {
+        //not relevant nor used.
+
         public static readonly JsonSerializerOptions Settings = new(JsonSerializerDefaults.General)
         {
             Converters =

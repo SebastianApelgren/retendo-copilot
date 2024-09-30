@@ -8,6 +8,8 @@ namespace RetendoCopilotChatbot
 {
     public class SecretManager
     {
+        //This class is used to retrieve the AWS access key and secret access key from the secret file. (will not be used by Retendo).
+
         public static string GetAwsAccessKey()
         {
             string secret = ReadSecretFile("AwsAccessKey.txt").Result;

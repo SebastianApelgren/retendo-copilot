@@ -9,6 +9,8 @@ namespace RetendoDataHandler.Models
 {
     public class SupportTicket
     {
+        //An object for each support ticket. It contains a subject and a list of messages.
+
         [JsonPropertyName("Subject")]
         public string Subject { get; set; }
 

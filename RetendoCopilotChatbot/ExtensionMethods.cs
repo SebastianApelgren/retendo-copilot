@@ -15,16 +15,22 @@ namespace RetendoCopilotChatbot
     {
         public static string GetText(this KnowledgeBaseRetrievalResult result)
         {
+            //used to get the context from the knowledge base retrieval result
+
             return result.Content.Text;
         }
 
         public static string CreateContextChunk(this List<string> contexts)
         {
+            //used to create a context chunk from the contexts
+
             return string.Join("\r\n-----------\r\n", contexts);
         }
 
         public static List<Message> ToAwsMessages(this List<ChatMessage> chatMessages)
         {
+            //used to convert chat messages to messages that can be sent to AWS.
+
             List<Message> messages = new List<Message>();
             foreach (ChatMessage chatMessage in chatMessages)
             {
@@ -110,6 +116,8 @@ namespace RetendoCopilotChatbot
 
         public static List<ChatMessage> RemoveDocumentsAndTickets(this List<ChatMessage> chatMessages)
         {
+            //used to remove documents and tickets from chat messages
+
             foreach (ChatMessage chatMessage in chatMessages)
             {
                 chatMessage.Documents = null;

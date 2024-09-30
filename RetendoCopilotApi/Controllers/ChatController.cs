@@ -13,6 +13,8 @@ namespace RetendoCopilotApi.Controllers
         [HttpPost("GetChatResponse")]
         public async Task<OutputBody> GetChatResponse([FromBody] UserInputBody body)
         {
+            //API endpoint to get chat response from input body.
+
             List<ChatMessage> chatMessages = ContextHelper.DeserializeAndConvertToString(body.Context);
 
             AwsHelper awsHelper = new AwsHelper(

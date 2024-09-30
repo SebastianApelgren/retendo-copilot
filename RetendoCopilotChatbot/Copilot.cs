@@ -5,7 +5,10 @@ namespace RetendoCopilotChatbot
 {
     public class Copilot
     {
+        // This class is responsible for generating a response to a user query. An object in this class will be enough to chat with the chatbot.
+
         private AwsHelper awsHelper;
+        private string cantHelpMessage = "Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan de hjälpa dig.";
 
         public Copilot(AwsHelper awsHelper)
         {
@@ -25,21 +28,26 @@ namespace RetendoCopilotChatbot
             string prompt = Prompts.ChatbotSystemPrompt;
 
             Stopwatch queryVerdictStopwatch = Stopwatch.StartNew();
+
+            //Check if the query should be searched in the documentation or not and if the query is appropriate to answer (not too personal or sensitive).
             string queryVerdict = await GetShouldSearchInDocumentationOrShouldAnswerAsync(query, costInformation);
+
             timingInformation.RegisterTiming(queryVerdictStopwatch, "query initial validation");
 
             List<string> contexts = new List<string>();
 
             if (queryVerdict.Contains("olämpligt"))
             {
-                return new ChatResponse("Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan de hjälpa dig.", timingInformation, costInformation);
+                return new ChatResponse(cantHelpMessage, timingInformation, costInformation);
             }
             else if (queryVerdict == "ja")
             {
                 Stopwatch retrieveContextTime = Stopwatch.StartNew();
 
-                //removes old documents and tickets as only 5 documents/tickets can be sent at a time.
+                //removes old documents and tickets as only 5 documents or tickets can be sent at a time as to not confuse the chatbot and not exceed the maximum documents send per chat (it is 5 total (docs + tickets))
                 chatMessages.RemoveDocumentsAndTickets();
+
+                //Retrieve the relevant tickets and documents from AWS
                 contexts = await awsHelper.RetrieveAsync(query, numberOfResultsManuals, numberOfResultsTickets);
 
                 try
@@ -47,6 +55,7 @@ namespace RetendoCopilotChatbot
                     List<string> documents = contexts.GetRange(0, numberOfResultsManuals);
                     List<string> tickets = contexts.GetRange(numberOfResultsManuals, numberOfResultsTickets);
 
+                    //adds documents and tickets to the chat messages
                     chatMessages.Add(ChatMessage.CreateFromUser(query, documents.CreateContextChunk(), tickets.CreateContextChunk()));
                 }
                 catch(IndexOutOfRangeException)
@@ -59,13 +68,15 @@ namespace RetendoCopilotChatbot
             else if (queryVerdict == "nej")
                 chatMessages.Add(ChatMessage.CreateFromUser(query, null, null));
             else
-                return new ChatResponse("Jag kan inte svara på den frågan. Vänligen kontakta Retendo's kundtjänst direkt så kan de hjälpa dig.", timingInformation, costInformation);
+                return new ChatResponse(cantHelpMessage, timingInformation, costInformation);
 
             Stopwatch generateResponseWatch = Stopwatch.StartNew();
+            //generate response from chatbot
             ConversationResponse response = await awsHelper.GenerateConversationResponseAsync(chatMessages, prompt);
             timingInformation.RegisterTiming(generateResponseWatch, "generate response");
             costInformation.AddTokens(response.inputTokens, response.outputTokens);
 
+            //checks if guardrail intervened and removes the last user message if it did (to not have it in the chat history that is sent to the chatbot)
             if (response.guardrailIntervened)
                 chatMessages.RemoveAt(chatMessages.Count - 1);
             else
@@ -78,6 +89,8 @@ namespace RetendoCopilotChatbot
 
         public async Task<string> GetShouldSearchInDocumentationAsync(string query, CostInformation costInformation)
         {
+            // This function determines if the query should be answered by the chatbot or if it should be searched in the documentation.
+
             string prompt = string.Format(Prompts.DocumentNeededPrompt, query);
 
             InvokeModelResult result = await awsHelper.GenerateResponseAsync(prompt);
@@ -89,6 +102,8 @@ namespace RetendoCopilotChatbot
 
         public async Task<string> GetShouldSearchInDocumentationOrShouldAnswerAsync(string query, CostInformation costInformation)
         {
+            //this function does the same as the above function but also checks if the user asked for personal information or something that is not appropriate to answer.
+
             string prompt = string.Format(Prompts.DocumentNeededAndRelevantQuestionPrompt, query);
 
             InvokeModelResult result = await awsHelper.GenerateResponseAsync(prompt);

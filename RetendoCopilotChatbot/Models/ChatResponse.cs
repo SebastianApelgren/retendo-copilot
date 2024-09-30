@@ -5,6 +5,8 @@ namespace RetendoCopilotChatbot.Models
 {
     public class ChatResponse
     {
+        //output from the copilot GetChatResponseAsync function with all relevant information for Retendo.
+
         [JsonPropertyName("message")]
         public string Message { get; set; }
 

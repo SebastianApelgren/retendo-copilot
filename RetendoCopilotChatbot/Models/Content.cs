@@ -9,6 +9,8 @@ namespace RetendoCopilotChatbot.Models
 {
     public partial class Content
     {
+        //Not relevant.
+
         [JsonPropertyName("type")]
         public string Type { get; set; }
 

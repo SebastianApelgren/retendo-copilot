@@ -9,13 +9,15 @@ namespace RetendoCopilotChatbot.Models
 {
     public class CostInformation
     {
+        //This class contains all cost information for the chatbot.
+
         [JsonPropertyName("inputTokens")]
         public double InputTokens { get; set; }
 
         [JsonPropertyName("outputTokens")]
         public double OutputTokens { get; set; }
 
-        [JsonPropertyName("cost")]
+        [JsonPropertyName("costInUSD")]
         public double Cost => Math.Round((InputTokens*0.003 + OutputTokens*0.015)/1000,4);
         
         public CostInformation(double inputToken = 0, double outputToken = 0)

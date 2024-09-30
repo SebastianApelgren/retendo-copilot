@@ -9,6 +9,8 @@ namespace RetendoCopilotChatbot.Models
 {
     public partial class Usage
     {
+        //not relevant
+        
         [JsonPropertyName("input_tokens")]
         public long InputTokens { get; set; }
 
