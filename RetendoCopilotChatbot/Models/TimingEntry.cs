@@ -4,6 +4,8 @@ namespace RetendoCopilotChatbot.Models
 {
     public class TimingEntry
     {
+        //used for timing information.
+
         [JsonPropertyName("name")]
         public string Name { get; set; }
 

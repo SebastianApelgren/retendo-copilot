@@ -2,6 +2,8 @@
 {
     public class EnvironmentVariableHelper
     {
+        //Helper class to get environment variables.
+
         private const string AwsAccessKeyId = "AWS_ACCESS_KEY_ID";
         private const string AwsSecretAccessKey = "AWS_SECRET_ACCESS_KEY";
         private const string ModelId = "MODEL_ID";

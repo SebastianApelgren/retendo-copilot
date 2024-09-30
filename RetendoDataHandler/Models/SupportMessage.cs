@@ -9,6 +9,8 @@ namespace RetendoDataHandler.Models
 {
     public class SupportMessage
     {
+        //This class is used to create support messages.
+
         [JsonPropertyName("role")]
         public string Role { get; set; }
         [JsonPropertyName("text")]

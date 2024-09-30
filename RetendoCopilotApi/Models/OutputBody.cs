@@ -5,6 +5,8 @@ namespace RetendoCopilotApi.Models
 {
     public class OutputBody
     {
+        //Output object for the API. Contains the response message, cost information, timings, and context.
+
         [JsonPropertyName("responseMessage")]
         public string ResponseMessage { get; set; }
 

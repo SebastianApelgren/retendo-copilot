@@ -9,6 +9,8 @@ namespace RetendoCopilotApi.Helpers
     {
         public static string SerializeAndConvertToBase64(List<ChatMessage> chatMessages)
         {
+            //Converts the chat history to a base64 string.
+
             string jsonString = JsonSerializer.Serialize(chatMessages);
             string context = Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonString));
 
@@ -17,6 +19,8 @@ namespace RetendoCopilotApi.Helpers
 
         public static List<ChatMessage> DeserializeAndConvertToString(string context)
         {
+            //Converts the base64 string to a chat history.
+
             if (string.IsNullOrEmpty(context))
                 return new List<ChatMessage>();
 

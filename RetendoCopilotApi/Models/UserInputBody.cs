@@ -4,6 +4,8 @@ namespace RetendoCopilotApi.Models
 {
     public class UserInputBody
     {
+        //Input object for the API. Contains the user message, context, and number of results for manuals and tickets.
+
         [JsonPropertyName("userMessage")]
         public string UserMessage { get; set; }
 
