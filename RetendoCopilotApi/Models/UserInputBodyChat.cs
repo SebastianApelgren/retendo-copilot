@@ -2,7 +2,7 @@
 
 namespace RetendoCopilotApi.Models
 {
-    public class UserInputBody
+    public class UserInputBodyChat
     {
         //Input object for the API. Contains the user message, context, and number of results for manuals and tickets.
 
@@ -19,7 +19,7 @@ namespace RetendoCopilotApi.Models
         public string Context { get; set; }
 
         [JsonConstructor]
-        public UserInputBody(string userMessage, string context, int numberOfResultsManuals = 3, int numberOfResultsTickets = 5)
+        public UserInputBodyChat(string userMessage, string context, int numberOfResultsManuals = 3, int numberOfResultsTickets = 5)
         {
             UserMessage = userMessage;
             Context = context;

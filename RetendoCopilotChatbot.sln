@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RetendoCopilotChatbot", "Re
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RetendoCopilotApi", "RetendoCopilotApi\RetendoCopilotApi.csproj", "{06F38B9F-2A17-4FC8-979E-BDF2BA7A4A09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetendoDataHandler", "RetendoDataHandler\RetendoDataHandler.csproj", "{EBDBCC54-60DA-4EBD-9F9B-E438DB1FC0D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RetendoDataHandler", "RetendoDataHandler\RetendoDataHandler.csproj", "{EBDBCC54-60DA-4EBD-9F9B-E438DB1FC0D9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -10,9 +10,9 @@ namespace RetendoDataHandler.Helper
 {
     public class PersonalDataHelper
     {
-        public static List<SupportTicket> GetSupportTickets(string path)
+        public static List<SupportTicket> GetSupportTicketsFromFile(string path)
         {
-            //This function reads all support tickets from the given path and returns a list of SupportTicket objects.
+            //This function reads all support tickets from a file at the given path and returns a list of SupportTicket objects.
             //It also removes some personal data from the messages.
 
             List<SupportTicket> tickets = new List<SupportTicket>();
@@ -62,6 +62,52 @@ namespace RetendoDataHandler.Helper
             return tickets;
         }
 
+        public static List<SupportTicket> GetSupportTicketsFromList(List<SupportTicketRaw> ticketsRaw)
+        {
+            //This function converts a list of SupportTicketRaw objects to a list of SupportTicket objects.
+            //And removes some personal data from the messages.
+
+            List<SupportTicket> tickets = new List<SupportTicket>();
+
+            HashSet<string> names = new HashSet<string>() { "jens", "apelgren" };
+
+            foreach (SupportTicketRaw ticket in ticketsRaw)
+            {
+                SupportTicket? supportTicket = ticket.ToSupportTicket();
+
+                if (supportTicket != null)
+                {
+                    tickets.Add(supportTicket);
+
+                    List<string> requesterName = ticket.Requester.Name.Split(" ").ToList();
+
+                    //adds the requester (users) name to the names list
+                    foreach (string name in requesterName)
+                    {
+                        string nameLower = name.ToLower();
+                        nameLower = Regex.Replace(nameLower, @"[\p{P}-[.]]", ""); //removes punctuation
+
+                        //checks if the name is already in the list
+                        if (!names.Contains(nameLower))
+                        {
+                            //checks if the name is valid (more than 2 letters, not only numbers and not "retendo")
+                            if (nameLower.Length < 3 || Regex.IsMatch(nameLower, @"^\d+$") || nameLower == "retendo")
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                names.Add(nameLower);
+                            }
+                        }
+                    }
+                }
+            }
+
+            RemoveNames(tickets, names.ToList());
+
+            return tickets;
+        }
 
         public static void RemoveNames(List<SupportTicket> tickets, List<string> names)
         {
