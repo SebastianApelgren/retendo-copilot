@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RetendoCopilotChatbot\RetendoCopilotChatbot.csproj" />
+    <ProjectReference Include="..\RetendoDataHandler\RetendoDataHandler.csproj" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties properties_4launchsettings_3git_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
