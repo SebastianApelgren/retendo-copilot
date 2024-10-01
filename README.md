@@ -1,12 +1,14 @@
-# What is this
+# Retendo Copilot
+
+## What is this
 
 This repository contains three projects.
 
-## RetendoCopilotApi
+### RetendoCopilotApi
 
 This is an REST API that offers 2 endpoints. One for getting a chat responce from a support chatbot and the other to upload tickets to the database that the chatbot is based on.
 
-### Usage
+#### Usage
 
 There is two API endpoint in this project. The first is "/GetChatResponse" which takes in a support question and returns the response and the context of the conversation, which is then used in the next request if you want to continue on the same conversation. You will also get returned some information about the cost of the call and how long each call to the LLM took.
 
@@ -57,11 +59,11 @@ Here is a return object of this API endpoint:
 }
 ```
 
-## RetendoCopilotChatbot
+### RetendoCopilotChatbot
 
 This project is a library that helps to interact with AWS. It is used to create a chatbot based on the RAG model. 
 
-### Usage
+#### Usage
 
 To use this library you create an object of the Copilot class. To do that you first need an object for the AwsHelper class. Here is how you initialize them:
 
@@ -86,11 +88,11 @@ public async Task<ChatResponse> GetChatResponseAsync(string query, List<ChatMess
 
 If the chatbot doesn't think it can answer the query because it is too personal or inappropriate it will return the class variable "cantHelpMessage" in the Copilot class. It is in swedish right now but can be changed to a code to then be implemented in the frontend if the user want's it.
 
-## RetendoDataHandler
+### RetendoDataHandler
 
 This is a library to upload data in bulk, more precisly tickets, to a AWS S3 bucket. It also removes some personal data, however, not at all enough to be a reliable personal data remover.
 
-### Usage
+#### Usage
 
 To use this library you need two objects, first an object in the AwsS3Helper class and then a DataHandler object. Here is how you create these:
 
@@ -110,6 +112,6 @@ You then call "UploadTickets" in the DataHandler class to upload tickets to the 
 public async Task<UploadTicketResult> UploadTickets(string dataPath = null, List<SupportTicketRaw> ticketsRaw = null)
 ```
 
-# Why this repository
+## Why this repository
 
 This repository will be used by Retendo to create a support chatbot which will be deployed to their users. It will help them with most support tickets and facilitate for their team and save them time.
