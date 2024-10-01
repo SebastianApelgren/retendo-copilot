@@ -16,8 +16,8 @@ When using the API, you can use the following JSON object as an example request 
 {
   "userMessage": "String",
   "context": "String",
-  "numberOfResultsManuals": "int",  // Optional (default: 3)
-  "numberOfResultsTickets": "int"   // Optional (default: 5)
+  "numberOfResultsManuals": "int",  "// Optional (default: 3)"
+  "numberOfResultsTickets": "int"   "// Optional (default: 5)"
 }
 ```
 
@@ -27,11 +27,11 @@ Here is an return object for the API:
 {
   "responseMessage": "string",
   "costInformation": {
-    // Represents an object of type CostInformation
+    "// Represents an object of type CostInformation"
   },
   "timings": [
     {
-      // Represents an object of type TimingEntry
+      "// Represents an object of type TimingEntry"
     }
   ],
   "context": "string"
