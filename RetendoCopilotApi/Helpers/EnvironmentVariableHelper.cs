@@ -12,6 +12,7 @@
         private const string KnowledgeBaseIdTickets = "KNOWLEDGE_BASE_ID_TICKETS";
         private const string GuardrailIdentifier = "GUARDRAIL_IDENTIFIER";
         private const string GuardrailVersion = "GUARDRAIL_VERSION";
+        private const string BucketName = "BUCKET_NAME";
 
         public static string GetAwsAccessKey()
         {
@@ -51,6 +52,11 @@
         public static string GetRegion()
         {
             return GetVariable(Region);
+        }
+
+        public static string GetBucketName()
+        {
+            return GetVariable(BucketName);
         }
 
         public static string GetVariable(string name)

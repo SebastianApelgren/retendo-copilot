@@ -5,6 +5,7 @@ using RetendoCopilotChatbot;
 using RetendoCopilotChatbot.Models;
 using RetendoDataHandler;
 using RetendoDataHandler.Helper;
+using RetendoDataHandler.Models;
 
 namespace RetendoCopilotApi.Controllers
 {
@@ -42,21 +43,22 @@ namespace RetendoCopilotApi.Controllers
         }
 
         [HttpPost("UploadSupportTickets")]
-        public async Task<bool> UploadSupportTickets([FromBody] UserInputBodyTickets body)
+        public async Task<UploadTicketResult> UploadSupportTickets([FromBody] UserInputBodyTickets body)
         {
             //API endpoint to upload support tickets to S3.
 
             AwsS3Helper awsS3Helper = new AwsS3Helper(
                 EnvironmentVariableHelper.GetRegion(),
                 EnvironmentVariableHelper.GetAwsAccessKey(),
-                EnvironmentVariableHelper.GetAwsSecretAccessKey()
+                EnvironmentVariableHelper.GetAwsSecretAccessKey(),
+                EnvironmentVariableHelper.GetBucketName()
             );
 
             DataHandler dataHandler = new DataHandler(awsS3Helper);
 
-            bool success = await dataHandler.UploadTickets(ticketsRaw:body.SupportTickets);
+            UploadTicketResult result = await dataHandler.UploadTickets(ticketsRaw:body.SupportTickets);
 
-            return success;
+            return result;
         }
     }
 }

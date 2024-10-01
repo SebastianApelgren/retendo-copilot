@@ -17,13 +17,13 @@ namespace RetendoDataHandler
             this.awsS3Helper = awsS3Helper;
         }
 
-        public async Task<bool> UploadTickets(string dataPath = null, List<SupportTicketRaw> ticketsRaw = null)
+        public async Task<UploadTicketResult> UploadTickets(string dataPath = null, List<SupportTicketRaw> ticketsRaw = null)
         {
-            //this function uploads the support tickets to the specified bucket and path in bucket in AWS S3.
+            //this function uploads the support tickets to the specified bucket in AWS S3.
 
             if (dataPath == null && ticketsRaw == null)
             {
-                return false;
+                return new UploadTicketResult(false,"No tickets where sent.");
             }
 
             List<SupportTicket> tickets;
@@ -45,8 +45,8 @@ namespace RetendoDataHandler
             // }
 
             // Upload the tickets to S3
-            bool success = await awsS3Helper.UploadToS3(bucketName, s3Folder, tickets);
-            return success;
+            UploadTicketResult result = await awsS3Helper.UploadToS3(tickets);
+            return result;
         }
     }
 }

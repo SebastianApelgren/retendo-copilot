@@ -23,6 +23,7 @@
         "GUARDRAIL_VERSION": "GuardrailVersion",
         "AWS_ACCESS_KEY_ID": "AccessKey",
         "AWS_SECRET_ACCESS_KEY": "SecretAccessKey",
+        "BUCKET_NAME": "BucketName",
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
