@@ -78,11 +78,13 @@ AwsHelper awsHelper = new AwsHelper(
 );
 Copilot copilot = new Copilot(awsHelper);
 ```
-You then call "GetChatResponseAsync" in the copilot class to generate a chat response based on the user query and chat history. "chatMessages" is the chat history, it will be returned to the user and doesn't need any modifying at all (it will be empty when doing the first request).
+You then call "GetChatResponseAsync" in the Copilot class to generate a chat response based on the user query and chat history. "chatMessages" is the chat history, it will be returned to the user and doesn't need any modifying at all (it will be empty when doing the first request).
 
 ```csharp
 public async Task<ChatResponse> GetChatResponseAsync(string query, List<ChatMessage> chatMessages, int numberOfResultsManuals = 3, int numberOfResultsTickets = 5)
 ```
+
+If the chatbot doesn't think it can answer the query because it is too personal or inappropriate it will return the class variable "cantHelpMessage" in the Copilot class. It is in swedish right now but can be changed to a code to then be implemented in the frontend if the user want's it.
 
 ## RetendoDataHandler
 
@@ -90,8 +92,24 @@ This is a library to upload data in bulk, more precisly tickets, to a AWS S3 buc
 
 ### Usage
 
+To use this library you need two objects, first an object in the AwsS3Helper class and then a DataHandler object. Here is how you create these:
 
+```csharp
+AwsS3Helper awsS3Helper = new AwsS3Helper(
+    region: "your-region",
+    awsAccessKey: "your-aws-access-key",
+    awsSecretAccessKey: "your-aws-secret-access-key",
+    bucketName: "your-bucket-name"
+);
+DataHandler dataHandler = new DataHandler(awsS3Helper);
+```
+
+You then call "UploadTickets" in the DataHandler class to upload tickets to the S3 bucket. You can either send in a path to files you want to upload. These files have to be row-wise filled with JSON object that are support tickets (that's how a support ticket export is done by Retendo's support provider). Otherwise, you can send in a list of rawSupportTickets which are just deserialized JSON support tickets. Here is the methods header:
+
+```csharp
+public async Task<UploadTicketResult> UploadTickets(string dataPath = null, List<SupportTicketRaw> ticketsRaw = null)
+```
 
 # Why this repository
 
-This repository will be used by Retendo to create a support chatbot which will be deployed to their users. 
+This repository will be used by Retendo to create a support chatbot which will be deployed to their users. It will help them with most support tickets and facilitate for their team and save them time.
